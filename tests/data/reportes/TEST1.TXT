@@ -1,0 +1,22 @@
+========================================
+Modo Cuantificación.....
+ID instrumento: ,67xx V1.64.5
+Nombre de usuario:,Alumnos
+Método: ,Test1
+ID de lote:,Lote por defecto
+Longitud de onda: ,450.0nm
+Modo de medición: ,Absorbance
+Número de estánd. usados:,4
+Std 1:,   0.00,Resultado 1:,   0.00
+Std 2:,   0.05,Resultado 2:,   0.61
+Std 3:,   0.50,Resultado 3:,   2.49
+Std 4:,   1.00,Resultado 4:,   2.95
+Ajuste de curva: ,Interpolación
+Seguridad de método:,Personal
+Escala automática: ,Activado
+Mínimo eje Y: ,-0.3
+Máximo eje Y: ,3.0
+última calibración:,12:52:49 15/09/26
+========================================
+Id,Abs,Conc,Fecha y hora
+001, 0.774,   0.09mM,12:54:07 15/09

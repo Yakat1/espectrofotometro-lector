@@ -1,0 +1,32 @@
+<summary><element id="0" type="3">
+<user>Alumnos</user>
+<method_name>Test2</method_name>
+<method_date>15/9/26 12:59:52</method_date>
+<filename>323bfdc8.JWB</filename>
+<lock>0</lock>
+<samples><s_data index="1" val="Lote por defecto 001" date="15/9/26 12:59:53" loc="323bfdc8.JWB"/>
+<s_data index="2" val="Lote por defecto 002" date="15/9/26 13:0:36" loc="323bfdf4.JWB"/>
+<s_data index="3" val="Lote por defecto 003" date="15/9/26 13:1:13" loc="323bfe19.JWB"/>
+<s_data index="4" val="Lote por defecto 004" date="15/9/26 13:1:51" loc="323bfe3f.JWB"/>
+</samples></element><element id="0" type="3">
+<user>Alumnos</user>
+<method_name>Test2</method_name>
+<method_date>15/9/26 12:58:22</method_date>
+<filename>323bfd6e.JWB</filename>
+<lock>0</lock>
+<samples><s_data index="1" val="Lote por defecto 001" date="15/9/26 12:58:23" loc="323bfd6e.JWB"/>
+</samples></element><element id="0" type="3">
+<user>Alumnos</user>
+<method_name>Método por defecto</method_name>
+<method_date>15/9/26 11:28:31</method_date>
+<filename>323be85f.JWB</filename>
+<lock>0</lock>
+<samples><s_data index="1" val="Lote por defecto 002" date="15/9/26 11:28:32" loc="323be85f.JWB"/>
+</samples></element><element id="0" type="3">
+<user>Alumnos</user>
+<method_name>Método por defecto</method_name>
+<method_date>15/9/26 10:36:9</method_date>
+<filename>323bdc19.JWB</filename>
+<lock>0</lock>
+<samples><s_data index="1" val="Lote por defecto 001" date="15/9/26 10:42:48" loc="323bdda7.JWB"/>
+</samples></element></summary>

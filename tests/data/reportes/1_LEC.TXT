@@ -1,0 +1,13 @@
+====================
+Modo Fotometría.....,
+ID instrumento: ,67xx V1.64.5
+ID de usuario:,Alumnos
+Método:,Método por defecto
+ID de lote:,Lote por defecto
+Longitud de onda:, 330.0
+Guardar automáticamente:,Desactivado
+Seguridad de método:,Personal
+última calibración:,11:22:30 15/09/26
+====================
+Id,Abs,T,Hora
+002,3.000,0.0,11:25:29

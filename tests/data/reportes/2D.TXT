@@ -1,0 +1,38 @@
+========================================
+Modo Cinética.....
+Muestra obtenida:,10:42:45 15/09/26
+ID instrumento: ,67xx V1.64.5
+Nombre de usuario:,Alumnos
+Método: ,Método por defecto
+ID de lote:,Lote por defecto
+Estándar cal. concentración: ,1.00
+Factor de concentración: ,1.00
+Desviación de concentración: ,0.00
+Longitud de onda:,400.0nm
+Tiempo de ejecución: ,30
+Tiempo de retardo: ,0
+Modo de medición: ,Absorbance
+Seguridad de método:,Personal
+Escala automática: ,Activado
+Mínimo eje Y: ,-0.3
+Máximo eje Y: ,3.0
+Número de ID de muestra:,1
+última calibración:,10:41:14 15/09/26
+========================================
+Lote por defecto:-
+Hora (  segundos),Celda,1
+0,-0.001
+2,0.000
+4,-0.001
+6,-0.000
+8,-0.001
+10,-0.000
+13,-0.001
+15,-0.000
+17,-0.000
+19,0.000
+21,0.000
+23,0.000
+25,0.000
+27,0.000
+29,-0.001

@@ -1,0 +1,34 @@
+<summary><element id="0" type="0">
+<user>Alumnos</user>
+<method_name>Método por defecto</method_name>
+<method_date>15/9/26 11:25:46</method_date>
+<filename>323be7ba.JWB</filename>
+<lock>0</lock>
+<samples><s_data index="1" val="Lote por defecto 002" date="15/9/26 11:25:47" loc="323be7ba.JWB"/>
+</samples></element><element id="0" type="0">
+<user>Alumnos</user>
+<method_name>Lowry Triplex</method_name>
+<method_date>15/9/26 9:54:59</method_date>
+<filename>323bd272.JWB</filename>
+<lock>1</lock>
+<samples></samples></element><element id="0" type="0">
+<user>Alumnos</user>
+<method_name>Lowry</method_name>
+<method_date>15/9/26 9:25:56</method_date>
+<filename>323bcba4.JWB</filename>
+<lock>1</lock>
+<samples><s_data index="1" val="Lote por defecto 001" date="15/9/26 9:28:34" loc="323bcba4.JWB"/>
+</samples></element><element id="0" type="0">
+<user>Supervisor</user>
+<method_name>Default Method</method_name>
+<method_date>1/1/0 3:5:39</method_date>
+<filename>00017d03.JWB</filename>
+<lock>0</lock>
+<samples></samples></element><element id="0" type="0">
+<user>Supervisor</user>
+<method_name>Default Method</method_name>
+<method_date>1/1/0 3:3:22</method_date>
+<filename>00017c7a.JWB</filename>
+<lock>0</lock>
+<samples><s_data index="1" val="Default Batch 001" date="1/1/0 3:3:42" loc="00017c7a.JWB"/>
+</samples></element></summary>

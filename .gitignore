@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Salidas generadas (informes, escaneos, capturas, previews)
+_informe_*/
+_escaneo_serie/
+_ui_preview/
+prueba/
+empaquetado/
+*.zip
+*.log
+
+# Builds PyInstaller
+build/
+dist/
+*.spec.bak

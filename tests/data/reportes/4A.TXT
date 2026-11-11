@@ -1,0 +1,21 @@
+========================================
+Modo Longitud de onda:.....
+ID instrumento: ,67xx V1.64.5
+ID de usuario:,Alumnos
+Método:,Método por defecto
+ID de lote:,Lote por defecto
+Seguridad de método:,Personal
+última calibración:,10:37:04 15/09/26
+K1:,   1.0
+K2:,   1.0
+K3:,   1.0
+K4:,   1.0
+K5:,   1.0
+Suma: ,A1/A2 & A1-A2
+========================================
+001,10:37:53 15/09/26
+1-,400.0nm,A1,-0.000
+2-,450.0nm,A2,-0.000
+3-,500.0nm,0.000
+4-,550.0nm,-0.001
+A1/A2,22.347,A1-A2,-0.000

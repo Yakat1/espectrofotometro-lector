@@ -1,0 +1,152 @@
+========================================
+Modo Cinética.....
+Muestra obtenida:,12:59:52 15/09/26
+ID instrumento: ,67xx V1.64.5
+Nombre de usuario:,Alumnos
+Método: ,Test2
+ID de lote:,Lote por defecto
+Estándar cal. concentración: ,1.00
+Factor de concentración: ,1.00
+Desviación de concentración: ,0.00
+Longitud de onda:,450.0nm
+Tiempo de ejecución: ,30
+Tiempo de retardo: ,0
+Modo de medición: ,Absorbance
+Seguridad de método:,Personal
+Escala automática: ,Activado
+Mínimo eje Y: ,-0.3
+Máximo eje Y: ,3.0
+Número de ID de muestra:,1
+última calibración:,12:58:52 15/09/26
+========================================
+Lote por defecto:-
+Hora (  segundos),Celda,1
+0,2.367
+2,2.364
+4,2.363
+6,2.366
+8,2.366
+10,2.363
+12,2.365
+14,2.362
+16,2.364
+18,2.364
+20,2.365
+22,2.364
+24,2.365
+27,2.364
+29,2.366
+========================================
+Modo Cinética.....
+Muestra obtenida:,13:00:36 15/09/26
+ID instrumento: ,67xx V1.64.5
+Nombre de usuario:,Alumnos
+Método: ,Test2
+ID de lote:,Lote por defecto
+Estándar cal. concentración: ,1.00
+Factor de concentración: ,1.00
+Desviación de concentración: ,0.00
+Longitud de onda:,450.0nm
+Tiempo de ejecución: ,30
+Tiempo de retardo: ,0
+Modo de medición: ,Absorbance
+Seguridad de método:,Personal
+Escala automática: ,Activado
+Mínimo eje Y: ,-0.3
+Máximo eje Y: ,3.0
+Número de ID de muestra:,2
+última calibración:,12:58:52 15/09/26
+========================================
+Lote por defecto:-
+Hora (  segundos),Celda,1
+1,0.397
+3,0.396
+5,0.396
+7,0.396
+9,0.396
+11,0.396
+13,0.397
+15,0.397
+17,0.396
+19,0.396
+21,0.396
+23,0.397
+25,0.397
+27,0.396
+29,0.396
+========================================
+Modo Cinética.....
+Muestra obtenida:,13:01:13 15/09/26
+ID instrumento: ,67xx V1.64.5
+Nombre de usuario:,Alumnos
+Método: ,Test2
+ID de lote:,Lote por defecto
+Estándar cal. concentración: ,1.00
+Factor de concentración: ,1.00
+Desviación de concentración: ,0.00
+Longitud de onda:,450.0nm
+Tiempo de ejecución: ,30
+Tiempo de retardo: ,0
+Modo de medición: ,Absorbance
+Seguridad de método:,Personal
+Escala automática: ,Activado
+Mínimo eje Y: ,-0.3
+Máximo eje Y: ,3.0
+Número de ID de muestra:,3
+última calibración:,12:58:52 15/09/26
+========================================
+Lote por defecto:-
+Hora (  segundos),Celda,1
+0,0.570
+2,0.570
+4,0.570
+6,0.570
+8,0.570
+10,0.570
+12,0.570
+14,0.571
+16,0.571
+18,0.571
+20,0.571
+22,0.571
+24,0.571
+26,0.571
+29,0.571
+========================================
+Modo Cinética.....
+Muestra obtenida:,13:01:51 15/09/26
+ID instrumento: ,67xx V1.64.5
+Nombre de usuario:,Alumnos
+Método: ,Test2
+ID de lote:,Lote por defecto
+Estándar cal. concentración: ,1.00
+Factor de concentración: ,1.00
+Desviación de concentración: ,0.00
+Longitud de onda:,450.0nm
+Tiempo de ejecución: ,30
+Tiempo de retardo: ,0
+Modo de medición: ,Absorbance
+Seguridad de método:,Personal
+Escala automática: ,Activado
+Mínimo eje Y: ,-0.3
+Máximo eje Y: ,3.0
+Número de ID de muestra:,4
+última calibración:,12:58:52 15/09/26
+========================================
+Lote por defecto:-
+Hora (  segundos),Celda,1
+0,2.909
+2,2.900
+4,2.907
+6,2.904
+8,2.905
+10,2.910
+12,2.911
+14,2.904
+16,2.908
+18,2.912
+20,2.901
+22,2.898
+25,2.907
+27,2.910
+29,2.909
