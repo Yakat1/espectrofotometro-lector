@@ -68,8 +68,11 @@
 <header>
   <h1>Programa Maestro — Jenway 6705</h1>
   <span id="estado">cargando Python…</span>
-  <label class="btn" style="display:inline-block">Cargar tarjeta
+  <label class="btn" style="display:inline-block">Cargar carpeta
     <input id="f_carpeta" type="file" webkitdirectory directory multiple style="display:none" disabled>
+  </label>
+  <label class="btn ghost" style="display:inline-block">O archivos sueltos
+    <input id="f_sueltos" type="file" multiple style="display:none" disabled>
   </label>
   <button class="btn ghost" id="b_csv" disabled>CSV de la vista</button>
   <button class="btn ghost" id="b_png" disabled>Figura PNG</button>
@@ -118,7 +121,7 @@ async function iniciar(){
     await pyodide.runPythonAsync("import visor");
     catalogo=JSON.parse(await pyodide.runPythonAsync("__import__('visor').catalogo_json()"));
     construirProcesado();
-    $("#f_carpeta").disabled=false;
+    $("#f_carpeta").disabled=false; $("#f_sueltos").disabled=false;
     estado("listo. Carga la tarjeta. ⬆");
   }catch(e){ estado("ERROR de inicio: "+e); console.error(e); }
 }
@@ -338,6 +341,7 @@ async function exportarXLSX(){
 
 // ---------------- eventos ----------------
 $("#f_carpeta").addEventListener("change",ev=>{ if(ev.target.files.length) montar(ev.target.files); });
+$("#f_sueltos").addEventListener("change",ev=>{ if(ev.target.files.length) montar(ev.target.files); });
 $("#b_csv").onclick=exportarCSV;
 $("#b_png").onclick=exportarPNG;
 $("#b_xlsx").onclick=exportarXLSX;
