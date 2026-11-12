@@ -383,3 +383,88 @@ def informe_xlsx_json() -> str:
         contenido = m.read()
     return _json({"xlsx_b64": base64.b64encode(contenido).decode("ascii"),
                   "metodos": len(tarjeta.metodos)})
+
+
+# ---------------------------------------------------------------------------
+# reporte .TXT con el formato que imprime el propio 6705
+# ---------------------------------------------------------------------------
+_MODOS_TITULO = {
+    "photometrics": "Fotometría", "spectrum": "Espectro",
+    "multi": "Longitud de onda:", "kinetics": "Cinética", "quantitation": "Cuantificación",
+}
+_FIRMWARE = "67xx V1.64.5"
+_SEP = "========================================"
+
+
+def _abs_txt(a):
+    """Absorbancia como la imprime el equipo: 3 decimales, clamp a 3.000 (SAT)."""
+    try:
+        v = float(a)
+    except (TypeError, ValueError):
+        return "3.000"
+    if not np.isfinite(v):
+        return "3.000"
+    return f"{min(v, 3.0):.3f}"
+
+
+def reporte_txt_json(payload: str) -> str:
+    """Reporte .TXT fiel al formato del instrumento, con los datos de la VISTA.
+
+    payload: {loc, modo, reglas, nombre, usuario, fecha}
+    """
+    datos = json.loads(payload)
+    loc, modo = datos["loc"], datos["modo"]
+    reglas = datos.get("reglas") or []
+    nombre = datos.get("nombre", "Método por defecto")
+    usuario = datos.get("usuario", "")
+    fecha = datos.get("fecha", "")
+    lineas = [_SEP, f"Modo {_MODOS_TITULO.get(modo, modo)}.....",
+              f"ID instrumento: ,{_FIRMWARE}",
+              f"Nombre de usuario:,{usuario}",
+              f"Método: ,{nombre}",
+              "ID de lote:,Lote por defecto"]
+
+    r = _decodificar(loc, modo)
+
+    if modo == "spectrum":
+        wl, A = _procesar(r, reglas)
+        lineas += [f"WRango de longitud de onda:,{r['wl0']:.1f}nm - {r['wl1']:.1f}nm",
+                   "Modo de medición: ,Absorbance"]
+        lineas += [_SEP, "Longitud de onda,Absorbancia"]
+        for i in range(len(wl)):
+            a = A[i]
+            val = _abs_txt(a)
+            lineas.append(f"{wl[i]:.1f},{val}")
+    elif modo == "kinetics":
+        lineas += [f"Longitud de onda:,{r['wl']:.1f}nm",
+                   f"Tiempo de ejecución: ,{r.get('tiempo_total', 0):.0f}",
+                   "Modo de medición: ,Absorbance"]
+        lineas += [_SEP, "Lote por defecto:-", "Hora (  segundos),Celda,1"]
+        tiempos = r.get("tiempos") or list(range(r["n"]))
+        for k, (_i, T, A) in enumerate(r["serie"]):
+            lineas.append(f"{tiempos[k]:.0f},{_abs_txt(A)}")
+    elif modo == "multi":
+        lineas += ["Seguridad de método:,Personal", "Suma: ,A1/A2 & A1-A2"]
+        lineas += [_SEP, f"001,{fecha}"]
+        for c in r["celdas"]:
+            lineas.append(f"{c['etiqueta'][-1]}-,{c['wl']:.1f}nm,{c['etiqueta']},{_abs_txt(c['abs'])}")
+        lineas.append(f"A1/A2,{r['A1/A2']:.3f},A1-A2,{r['A1-A2']:.3f}")
+    elif modo == "quantitation":
+        stds = r["estandares"]
+        lineas += [f"Longitud de onda: ,{r['wl']:.1f}nm",
+                   "Modo de medición: ,Absorbance",
+                   f"Número de estánd. usados:,{len(stds)}"]
+        for i, (c, a) in enumerate(stds, 1):
+            lineas.append(f"Std {i}:,{c:8.2f},Resultado {i}:,{a:8.2f}")
+        lineas += ["Ajuste de curva: ,Interpolación"]
+        lineas += [_SEP, "Id,Abs,Conc,Fecha y hora"]
+        am = r.get("abs_muestra")
+        lineas.append(f"001,{_abs_txt(am)},{fecha}")
+    else:  # photometrics
+        lineas += [f"Longitud de onda:, {r['wl']:.1f}",
+                   "Guardar automáticamente:,Desactivado",
+                   "Seguridad de método:,Personal"]
+        lineas += [_SEP, "Id,Abs,T,Hora"]
+        lineas.append(f"002,{_abs_txt(r['abs'])},{r['t']:.1f},")
+
+    return _json({"txt": "\r\n".join(lineas)})

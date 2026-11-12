@@ -8,19 +8,19 @@
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   body { font-family: system-ui, Segoe UI, Roboto, sans-serif; margin: 0; background: #101418; color: #e6e6e6; height: 100vh; }
-  header { height: 56px; display: flex; align-items: center; gap: .8rem; padding: 0 1.1rem;
+  header { height: 56px; display: flex; align-items: center; gap: .7rem; padding: 0 1.1rem; flex-wrap: nowrap;
            background: linear-gradient(135deg, #16202b, #101418); border-bottom: 1px solid #2a3543; }
-  h1 { font-size: 1.05rem; margin: 0; white-space: nowrap; }
-  #estado { color: #9aa7b4; font-size: .82rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  h1 { font-size: 1.02rem; margin: 0; white-space: nowrap; }
+  #estado { color: #9aa7b4; font-size: .8rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .btn { background: #e08a2e; color: #101418; border: 0; border-radius: 7px; padding: .42rem .8rem;
-         font-weight: 600; font-size: .82rem; cursor: pointer; }
+         font-weight: 600; font-size: .8rem; cursor: pointer; }
   .btn:disabled { opacity: .4; cursor: wait; }
   .btn.ghost { background: transparent; color: #e6e6e6; border: 1px solid #2a3543; }
+  select { background: #101418; color: #e6e6e6; border: 1px solid #2a3543; border-radius: 7px; padding: .4rem .5rem; font-size: .8rem; }
   .cuerpo { display: flex; height: calc(100vh - 56px); }
   #side { width: 330px; min-width: 330px; border-right: 1px solid #2a3543; overflow-y: auto;
           background: #131a22; padding: .6rem; }
-  .metodo { border: 1px solid #2a3543; border-radius: 8px; padding: .5rem .65rem; margin-bottom: .45rem;
-            cursor: pointer; }
+  .metodo { border: 1px solid #2a3543; border-radius: 8px; padding: .5rem .65rem; margin-bottom: .45rem; cursor: pointer; }
   .metodo:hover { border-color: #e08a2e; }
   .metodo.sel { border-color: #e08a2e; background: #1c2632; }
   .chip { display: inline-block; font-size: .66rem; text-transform: uppercase; letter-spacing: .05em;
@@ -40,7 +40,7 @@
            padding: .3rem .7rem; font-size: .8rem; }
   .caja { background: #161d26; border: 1px solid #2a3543; border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; }
   .caja h3 { margin: 0 0 .5rem; font-size: .92rem; color: #f0a24b; }
-  #grafico { text-align: center; }
+  #grafico { width: 100%; }
   #grafico img { max-width: 100%; border-radius: 8px; border: 1px solid #2a3543; }
   .analisis { display: flex; flex-wrap: wrap; gap: .5rem; }
   .kv { background: #1b2530; border: 1px solid #2a3543; border-radius: 7px; padding: .35rem .6rem; font-size: .8rem; }
@@ -61,6 +61,8 @@
   #cadena { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; font-size: .8rem; margin-top: .6rem; }
   .paso { background: #1c2632; border: 1px solid #2a3543; border-radius: 6px; padding: .3rem .6rem; }
   #cadena .btn { padding: .3rem .6rem; }
+  .kin-ctrl { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-bottom: .5rem; font-size: .8rem; }
+  .kin-ctrl input { width: 70px; background: #101418; color: #e6e6e6; border: 1px solid #2a3543; border-radius: 5px; padding: .25rem .4rem; }
   footer { color: #55626f; font-size: .72rem; padding: .4rem 1.2rem; }
 </style>
 </head>
@@ -71,29 +73,37 @@
   <label class="btn" style="display:inline-block">Cargar carpeta
     <input id="f_carpeta" type="file" webkitdirectory directory multiple style="display:none" disabled>
   </label>
-  <label class="btn ghost" style="display:inline-block">O archivos sueltos
+  <label class="btn ghost" style="display:inline-block">O archivos
     <input id="f_sueltos" type="file" multiple style="display:none" disabled>
   </label>
-  <button class="btn ghost" id="b_csv" disabled>CSV de la vista</button>
-  <button class="btn ghost" id="b_png" disabled>Figura PNG</button>
-  <button class="btn ghost" id="b_xlsx" disabled>Informe Excel</button>
+  <select id="orden" title="Ordenar métodos">
+    <option value="fecha">Por fecha</option>
+    <option value="modo">Por tipo de lectura</option>
+    <option value="usuario">Por usuario</option>
+  </select>
+  <button class="btn ghost" id="b_txt" disabled>Reporte .txt</button>
+  <button class="btn ghost" id="b_csv" disabled>CSV</button>
+  <button class="btn ghost" id="b_png" disabled>PNG</button>
+  <button class="btn ghost" id="b_xlsx" disabled>Excel</button>
 </header>
 <div class="cuerpo">
-  <nav id="side"><div class="nota" style="padding:.6rem">Sin tarjeta cargada. Elige "Cargar tarjeta" arriba (los datos no salen de tu equipo).</div></nav>
+  <nav id="side"><div class="nota" style="padding:.6rem">Sin tarjeta cargada. Elige "Cargar carpeta" arriba (los datos no salen de tu equipo).</div></nav>
   <main id="main"><div class="caja"><h3>Bienvenido</h3>
     <p style="color:#9aa7b4">Sube la carpeta copiada de la tarjeta del 6705 (<code>.JWB/.JWX/.JWU</code>).
-    Se listarán los métodos; haz clic en uno y luego en alguna de sus muestras. Podrás analizar, procesar
-    espectros y exportar CSV / informe Excel. La conexión física (RS-232) sigue siendo del programa de escritorio.</p>
+    Se listarán los métodos; haz clic en uno y luego en una muestra. Podrás analizar, procesar espectros,
+    marcar la cinética cada N segundos y exportar CSV / PNG / informe Excel / reporte .txt.</p>
   </div></main>
 </div>
 <footer>Motor Python (Pyodide) con los parsers validados del proyecto jenway67. La primera carga descarga el intérprete y bibliotecas (~60 MB, queda en caché).</footer>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script>
 "use strict";
-let pyodide=null, catalogo=null, indice=null;
+let pyodide=null, catalogo=null, indice=null, listaMetodos=null;
 let metAct=-1, mueAct=null, cadena=[];   // método seleccionado, muestra, cadena de procesado
-let ultimaVista=null;                    // último {tabla, figura_b64, resumen} para CSV/PNG
+let ultimaVista=null;                    // último {tabla, figura_b64, resumen, analisis, modo}
+let orden="fecha", marcasCine=[], datoCine=null;
 
 const $=s=>document.querySelector(s);
 const estado=e=>{ const el=$("#estado"); el.textContent=e; };
@@ -109,7 +119,6 @@ async function iniciar(){
     pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.5/full/"});
     estado("cargando numpy, matplotlib, pillow…");
     await pyodide.loadPackage(["matplotlib","pillow","micropip"]);
-    // openpyxl no viene en el índice de Pyodide; es Python puro -> micropip desde PyPI
     await pyodide.runPythonAsync("import micropip; await micropip.install('openpyxl')");
     pyodide.FS.mkdirTree("/lib"); pyodide.FS.mkdirTree("/lib/jenway67"); pyodide.FS.mkdirTree("/card");
     await pyodide.runPythonAsync("import sys; sys.path.insert(0,'/lib')");
@@ -120,7 +129,6 @@ async function iniciar(){
     pyodide.FS.writeFile("/lib/visor.py", await (await fetch("visor.py")).text());
     await pyodide.runPythonAsync("import visor");
     catalogo=JSON.parse(await pyodide.runPythonAsync("__import__('visor').catalogo_json()"));
-    construirProcesado();
     $("#f_carpeta").disabled=false; $("#f_sueltos").disabled=false;
     estado("listo. Carga la tarjeta. ⬆");
   }catch(e){ estado("ERROR de inicio: "+e); console.error(e); }
@@ -128,9 +136,7 @@ async function iniciar(){
 
 // ---------------- procesado (UI generada del catálogo) ----------------
 function construirProcesado(){
-  if(!document.getElementById("proc")){ return; }
-  const box=$("#proc-col");
-  if(!box) return;
+  const box=$("#proc-col"); if(!box) return;
   let html=`<h3>Procesado espectral</h3><div id="proc-op">`;
   for(const g of catalogo.grupos){
     for(const clave of Object.keys(catalogo.operaciones)){
@@ -144,10 +150,9 @@ function construirProcesado(){
         if(p.tipo==="lista"){
           html+=`<select id="${id}">`+p.opciones.map(o=>`<option ${String(o)===String(p.defecto)?"selected":""}>${o}</option>`).join("")+`</select>`;
         }else{
-          const ph = (p.tipo==="opcional_float" && p.defecto==="") ? "vacío" : p.defecto;
-          const atr = p.minimo!=null?` min="${p.minimo}"`:"";
-          const atr2 = p.maximo!=null?` max="${p.maximo}"`:"";
-          html+=`<input id="${id}" type="${p.tipo==="int"?"number":"number"}" step="any" value="${ph}" placeholder="${ph}"${atr}${atr2}>`;
+          const ph = (p.tipo==="opcional_float" && p.defecto==="") ? "" : p.defecto;
+          const atr = p.minimo!=null?` min="${p.minimo}"`:""; const atr2 = p.maximo!=null?` max="${p.maximo}"`:"";
+          html+=`<input id="${id}" type="number" step="any" value="${ph}" placeholder="${p.tipo==="opcional_float"?"vacío":""}"${atr}${atr2}>`;
         }
         html+=`</div>`;
       }
@@ -158,21 +163,19 @@ function construirProcesado(){
   box.innerHTML=html;
   box.querySelectorAll(".op button").forEach(b=>b.onclick=()=>aplicarOp(b.closest(".op")));
 }
-
 function leerParams(op){
   const out={};
   op.querySelectorAll("[id^=p_]").forEach(inp=>{
     const nom=inp.id.split("_").slice(2).join("_");
     let val=inp.value.trim();
-    if(val==="" ){ out[nom]=null; return; }
-    out[nom]= inp.tagName==="SELECT" ? val : (inp.type==="number" ? Number(val) : val);
+    if(val===""){ out[nom]=null; return; }
+    out[nom]= inp.tagName==="SELECT" ? val : Number(val);
   });
   return out;
 }
 function aplicarOp(op){
   const clave=op.dataset.clave;
-  const params=leerParams(op);
-  cadena.push({clave, parametros:params});
+  cadena.push({clave, parametros:leerParams(op)});
   pintarCadena(); renderVista();
 }
 function pintarCadena(){
@@ -187,6 +190,19 @@ function pintarCadena(){
   const cl=$("#b_cl"); if(cl) cl.onclick=()=>{cadena=[]; pintarCadena(); renderVista();};
 }
 
+// ---------------- orden ----------------
+function aplicarOrden(){
+  listaMetodos=[...indice.metodos];
+  if(orden==="modo"){
+    const o={photometrics:0,spectrum:1,multi:2,kinetics:3,quantitation:4};
+    listaMetodos.sort((a,b)=>(o[a.modo]-o[b.modo]) || (a.fecha<b.fecha?-1:1));
+  } else if(orden==="usuario"){
+    listaMetodos.sort((a,b)=>a.usuario.localeCompare(b.usuario) || (a.fecha<b.fecha?-1:1));
+  } else {
+    listaMetodos.sort((a,b)=>(a.fecha<b.fecha?-1:(a.fecha>b.fecha?1:0)));
+  }
+}
+
 // ---------------- carga de la tarjeta ----------------
 async function montar(archivos){
   estado("montando "+archivos.length+" archivos…");
@@ -199,7 +215,7 @@ async function montar(archivos){
     }
     estado("decodificando índice…");
     indice=JSON.parse(await pyodide.runPythonAsync("__import__('visor').indice_json()"));
-    pintarLista();
+    aplicarOrden(); pintarLista();
     estado("hecho.");
   }catch(e){ estado("ERROR al montar: "+e); console.error(e); }
 }
@@ -207,8 +223,8 @@ async function montar(archivos){
 function pintarLista(){
   const side=$("#side");
   if(!indice.metodos.length){ side.innerHTML=`<div class="nota" style="padding:.6rem">No se encontró un índice válido (.JWX). ¿Es la carpeta copiada de la tarjeta?</div>`; return; }
-  let html=`<div class="nota" style="padding:.3rem .6rem .6rem">Usuarios: ${indice.usuarios.join(", ")||"(ninguno)"} · ${indice.metodos.length} métodos</div>`;
-  indice.metodos.forEach((m,i)=>{
+  let html=`<div class="nota" style="padding:.3rem .6rem .6rem">Usuarios: ${indice.usuarios.join(", ")||"(ninguno)"} · ${listaMetodos.length} métodos</div>`;
+  listaMetodos.forEach((m,i)=>{
     html+=`<div class="metodo${i===metAct?" sel":""}" data-i="${i}">
       <span class="chip modo-${esModo(m.modo)}">${m.modo}</span><span class="mn">${m.nombre}</span>
       <div class="mmeta">${m.usuario} · ${m.fecha} · ${m.muestras.length} muestra(s)</div>
@@ -219,23 +235,21 @@ function pintarLista(){
   });
   side.innerHTML=html;
   side.querySelectorAll(".metodo").forEach(el=>el.onclick=()=>{
-    metAct=+el.dataset.i; mueAct=null; cadena=[];
-    const m=indice.metodos[metAct];
-    mueAct = m.modo==="photometrics" ? m.muestras[0] : m.muestras[0];
+    metAct=+el.dataset.i; mueAct=null; cadena=[]; marcasCine=[]; datoCine=null;
+    mueAct=listaMetodos[metAct].muestras[0];
     pintarLista(); renderVista();
   });
   side.querySelectorAll(".muestra").forEach(el=>el.onclick=(ev)=>{
-    ev.stopPropagation(); mueAct=decodeURIComponent(el.dataset.loc); cadena=[];
+    ev.stopPropagation(); mueAct=decodeURIComponent(el.dataset.loc); cadena=[]; marcasCine=[]; datoCine=null;
     side.querySelectorAll(".muestra").forEach(x=>x.classList.toggle("on",x===el));
     renderVista();
   });
-  // panel de procesado solo para spectum (puede no existir aun: #main se crea en renderVista)
-  const pc=$("#proc-col"); if(pc){ pc.style.display = indice.metodos[metAct] && indice.metodos[metAct].modo==="spectrum" ? "" : "none"; }
+  const pc=$("#proc-col"); if(pc){ pc.style.display = listaMetodos[metAct] && listaMetodos[metAct].modo==="spectrum" ? "" : "none"; }
 }
 
 // ---------------- vista ----------------
 async function renderVista(){
-  const m=indice.metodos[metAct]; if(!m||!mueAct){ return; }
+  const m=listaMetodos[metAct]; if(!m||!mueAct){ return; }
   const esPhoto = m.modo==="photometrics";
   const payload={loc:mueAct, modo:m.modo,
                  locs: esPhoto ? m.muestras : undefined,
@@ -251,22 +265,121 @@ async function renderVista(){
         <span class="loc">${v.loc}</span><span>${v.resumen}</span>
         ${v.avisos.map(a=>`<span class="aviso">⚠ ${a}</span>`).join("")}
       </div>
-      <div class="caja"><h3>Gráfica</h3><div id="grafico">${v.figura_b64?`<img alt="" src="data:image/png;base64,${v.figura_b64}">`:"<span class='nota'>sin figura</span>"}</div></div>
+      <div class="caja"><h3>Gráfica (interactiva)</h3><div id="grafico"></div></div>
+      <div class="caja" id="kin-box" style="display:${v.modo==="kinetics"?"":"none"}">
+        <h3>Marcas de cinética</h3>
+        <div class="kin-ctrl">
+          <label>Cada <input id="k_int" type="number" value="30" min="1"> s</label>
+          <button class="btn" id="k_marcar">Marcar cada</button>
+          <button class="btn ghost" id="k_borrar">Borrar marcas</button>
+        </div>
+        <div class="tabla-wrap" style="max-height:180px"><table id="k_tabla"><tr><th>Tiempo (s)</th><th>Absorbancia</th></tr></table></div>
+        <div class="nota">Haz clic sobre la gráfica para marcar/quitar un punto.</div>
+      </div>
       <div class="caja"><h3>Análisis</h3><div class="analisis" id="ana"></div></div>
       <div class="caja"><h3>Tabla de la vista</h3><div class="tabla-wrap"><table id="tabla"></table></div>
-        <div class="nota">Primeras 300 filas en pantalla; la tabla completa en "CSV de la vista".</div></div>
+        <div class="nota">Primeras 300 filas en pantalla; la tabla completa en "CSV".</div></div>
       <div class="caja" id="proc-collapse" style="display:${v.modo==="spectrum"?"":"none"}">
         <div id="proc-col" style="display:${v.modo==="spectrum"?"":"none"}"><div class="nota">generando panel…</div></div>
         <div id="proc" style="display:none"></div>
       </div>`;
     if(v.modo==="spectrum"){ construirProcesado(); pintarCadena(); }
+    if(v.modo==="kinetics"){ datoCine=kinDatos(v); $("#k_marcar").onclick=marcarCada; $("#k_borrar").onclick=borrarMarcas; }
+    pintarGrafico(v);
     pintarAnalisis(v);
     pintarTabla(v.tabla,300);
-    $("#b_csv").disabled=false; $("#b_png").disabled=!!(!v.figura_b64); $("#b_xlsx").disabled=false;
+    $("#b_txt").disabled=false; $("#b_csv").disabled=false; $("#b_png").disabled=!!(!v.figura_b64); $("#b_xlsx").disabled=false;
     estado("hecho.");
   }catch(e){ estado("ERROR: "+e); console.error(e); }
 }
 
+// ---------------- gráfica interactiva (Plotly) ----------------
+function temaPlotly(){
+  return {paper_bgcolor:"#161d26", plot_bgcolor:"#161d26", font:{color:"#e6e6e6", size:11},
+          margin:{l:55,r:20,t:35,b:45}, showlegend:true, legend:{font:{size:10}}};
+}
+function kinDatos(v){
+  const t=[], a=[];
+  for(const f of v.tabla.filas){ t.push(parseFloat(f[0])); const av=f[2]; a.push(av==="—"?null:parseFloat(av)); }
+  return {t,a};
+}
+function pintarGrafico(v){
+  const el=$("#grafico"); if(!el) return;
+  if(typeof Plotly==="undefined"){
+    el.innerHTML = v.figura_b64?`<img alt="" src="data:image/png;base64,${v.figura_b64}">`:"<span class='nota'>sin figura</span>";
+    return;
+  }
+  let data=[], layout=temaPlotly(), config={responsive:true, displaylogo:false, modeBarButtonsToRemove:["lasso2d","select2d"]};
+  const num=s=>{ const x=parseFloat(s); return isFinite(x)?x:null; };
+  if(v.modo==="spectrum"){
+    const x=v.tabla.filas.map(f=>num(f[0])), y=v.tabla.filas.map(f=>{const z=num(f[1]); return z==null?null:z;});
+    data.push({type:"scatter", x, y, mode:"lines", name:"Abs", line:{color:"#e08a2e", width:1.2}});
+    if(v.analisis.picos && v.analisis.picos.length){
+      data.push({type:"scatter", x:v.analisis.picos.map(p=>p.wl), y:v.analisis.picos.map(p=>p.abs),
+                 mode:"markers", name:"Picos", marker:{color:"#c94f4f", size:7}});
+    }
+    layout.xaxis={title:"Longitud de onda (nm)"}; layout.yaxis={title:"Absorbancia"};
+  } else if(v.modo==="kinetics"){
+    data.push({type:"scatter", x:datoCine.t, y:datoCine.a, mode:"lines+markers", name:"Abs", line:{color:"#d98ac2", width:1.4}, marker:{size:3}});
+    layout.xaxis={title:"Tiempo (s)"}; layout.yaxis={title:"Absorbancia"};
+    layout.shapes = marcasCine.map(t=>({type:"line", x0:t, x1:t, y0:0, y1:1, yref:"paper",
+      line:{color:"#f0a24b", width:1, dash:"dot"}}));
+  } else if(v.modo==="quantitation"){
+    const std=(v.analisis.curva.estandares||[]).map(e=>[num(e[0]),num(e[1])]);
+    const xs=std.map(e=>e[0]), ys=std.map(e=>e[1]);
+    data.push({type:"scatter", x:xs, y:ys, mode:"markers+lines", name:"estándares", line:{dash:"dot", color:"#7a8ca0"}, marker:{color:"#e08a2e", size:8}});
+    layout.xaxis={title:"Concentración"}; layout.yaxis={title:"Absorbancia"};
+  } else if(v.modo==="multi"){
+    const celdas=v.tabla.filas.filter(f=>f[0].match(/^A[0-9]$/));
+    data.push({type:"bar", x:celdas.map(f=>f[0]), y:celdas.map(f=>num(f[2])), marker:{color:"#7ac98e"}});
+    layout.yaxis={title:"Absorbancia"};
+  } else { // photometrics
+    const vals=v.tabla.filas.map(f=>num(f[3]));
+    data.push({type:"bar", x:v.tabla.filas.map((_,i)=>`#${i+1}`), y:vals, marker:{color:"#7fb5e0"}});
+    layout.yaxis={title:"Absorbancia"};
+  }
+  Plotly.react(el, data, layout, config);
+  if(v.modo==="kinetics"){
+    el.on("plotly_click", ev=>{
+      const p=ev.points&&ev.points[0]; if(!p) return;
+      toggleMarca(p.x);
+    });
+  }
+}
+
+function toggleMarca(t){
+  const eps=1e-6;
+  const i=marcasCine.findIndex(m=>Math.abs(m-t)<eps);
+  if(i>=0) marcasCine.splice(i,1); else marcasCine.push(t);
+  marcasCine.sort((a,b)=>a-b);
+  pintarGrafico(ultimaVista); pintarBitacora();
+}
+function marcarCada(){
+  const N=parseFloat($("#k_int").value)||30;
+  if(!datoCine || !datoCine.t.length) return;
+  const tmax=Math.max(...datoCine.t);
+  for(let tt=0; tt<=tmax+1e-6; tt+=N){
+    // ajustar al tiempo real más cercano
+    let best=datoCine.t[0], bd=1e18;
+    for(const t of datoCine.t){ const d=Math.abs(t-tt); if(d<bd){bd=d;best=t;} }
+    if(!marcasCine.some(m=>Math.abs(m-best)<1e-6)) marcasCine.push(best);
+  }
+  marcasCine.sort((a,b)=>a-b);
+  pintarGrafico(ultimaVista); pintarBitacora();
+}
+function borrarMarcas(){ marcasCine=[]; pintarGrafico(ultimaVista); pintarBitacora(); }
+function pintarBitacora(){
+  const t=$("#k_tabla"); if(!t||!datoCine) return;
+  let h="<tr><th>Tiempo (s)</th><th>Absorbancia</th></tr>";
+  for(const m of marcasCine){
+    let bd=1e18, abs=null;
+    for(let i=0;i<datoCine.t.length;i++){ const d=Math.abs(datoCine.t[i]-m); if(d<bd){bd=d;abs=datoCine.a[i];} }
+    h+=`<tr><td>${m.toFixed(1)}</td><td>${abs==null?"—":abs.toFixed(4)}</td></tr>`;
+  }
+  t.innerHTML=h;
+}
+
+// ---------------- análisis + tabla ----------------
 function pintarAnalisis(v){
   const a=v.analisis, box=$("#ana"); if(!box) return; let h="";
   const kv=(k,val)=> h+=`<span class="kv"><b>${k}</b>${val}</span>`;
@@ -307,14 +420,13 @@ function pintarAnalisis(v){
 function pintarTabla(tabla,cap){
   const t=$("#tabla"); if(!t) return;
   let h="<tr>"+tabla.columnas.map(c=>`<th>${c}</th>`).join("")+"</tr>";
-  const filas=tabla.filas.slice(0,cap);
-  for(const f of filas) h+="<tr>"+f.map(c=>`<td>${c}</td>`).join("")+"</tr>";
+  for(const f of tabla.filas.slice(0,cap)) h+="<tr>"+f.map(c=>`<td>${c}</td>`).join("")+"</tr>";
   t.innerHTML=h;
 }
 
 // ---------------- exportar ----------------
 function descargar(blob,nombre){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=nombre; a.click(); URL.revokeObjectURL(a.href);}
-function nomArchivo(ext){ const base=(indice&&indice.metodos[metAct]?indice.metodos[metAct].nombre:"vista").replace(/[\\/:*?"<>| ]+/g,"_"); return `Maestro_${base}${ext}`; }
+function nomArchivo(ext){ const base=(listaMetodos&&listaMetodos[metAct]?listaMetodos[metAct].nombre:"vista").replace(/[\\/:*?"<>| ]+/g,"_"); return `Maestro_${base}${ext}`; }
 
 function exportarCSV(){
   if(!ultimaVista||!ultimaVista.tabla) return;
@@ -325,6 +437,18 @@ function exportarCSV(){
 function exportarPNG(){
   if(!ultimaVista||!ultimaVista.figura_b64) return;
   const a=document.createElement("a"); a.href="data:image/png;base64,"+ultimaVista.figura_b64; a.download=nomArchivo(".png"); a.click();
+}
+async function exportarTXT(){
+  const m=listaMetodos[metAct]; if(!m||!mueAct) return;
+  estado("generando reporte .txt…");
+  try{
+    const payload={loc:mueAct, modo:m.modo, reglas:m.modo==="spectrum"?cadena:[],
+                   nombre:m.nombre, usuario:m.usuario, fecha:m.fecha};
+    const js=await pyodide.runPythonAsync("__import__('visor').reporte_txt_json("+JSON.stringify(JSON.stringify(payload))+")");
+    const r=JSON.parse(js);
+    descargar(new Blob([r.txt],{type:"text/plain;charset=utf-8"}), nomArchivo(".txt"));
+    estado("reporte .txt exportado.");
+  }catch(e){ estado("ERROR en reporte: "+e); console.error(e); }
 }
 async function exportarXLSX(){
   const b=$("#b_xlsx"); b.disabled=true; estado("generando informe Excel (toda la tarjeta)… puede tardar");
@@ -342,6 +466,8 @@ async function exportarXLSX(){
 // ---------------- eventos ----------------
 $("#f_carpeta").addEventListener("change",ev=>{ if(ev.target.files.length) montar(ev.target.files); });
 $("#f_sueltos").addEventListener("change",ev=>{ if(ev.target.files.length) montar(ev.target.files); });
+$("#orden").addEventListener("change",ev=>{ orden=ev.target.value; if(indice){ metAct=-1; mueAct=null; cadena=[]; marcasCine=[]; aplicarOrden(); pintarLista(); } });
+$("#b_txt").onclick=exportarTXT;
 $("#b_csv").onclick=exportarCSV;
 $("#b_png").onclick=exportarPNG;
 $("#b_xlsx").onclick=exportarXLSX;
