@@ -105,7 +105,7 @@ async function iniciar(){
     estado("cargando Pyodide (~10 MB)…");
     pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.5/full/"});
     estado("cargando numpy, matplotlib, pillow…");
-    await pyodide.loadPackage(["matplotlib","pillow"]);
+    await pyodide.loadPackage(["matplotlib","pillow","micropip"]);
     // openpyxl no viene en el índice de Pyodide; es Python puro -> micropip desde PyPI
     await pyodide.runPythonAsync("import micropip; await micropip.install('openpyxl')");
     pyodide.FS.mkdirTree("/lib"); pyodide.FS.mkdirTree("/lib/jenway67"); pyodide.FS.mkdirTree("/card");
