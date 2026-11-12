@@ -37,11 +37,11 @@
   <div class="controles">
     <label>
       <b>1. Elige la carpeta copiada de la tarjeta</b>
-      <input id="carpeta" type="file" webkitdirectory directory multiple>
+      <input id="carpeta" type="file" webkitdirectory directory multiple disabled>
     </label>
     <label>
       <b>2. …o suelta archivos sueltos</b> (<code>.JWB</code>/<code>.JWX</code>/<code>.JWU</code>/<code>.TXT</code>)
-      <input id="sueltos" type="file" multiple>
+      <input id="sueltos" type="file" multiple disabled>
     </label>
     <div style="color:#9aa7b4;font-size:.82rem" id="detalle"></div>
   </div>
@@ -77,6 +77,7 @@ async function iniciar() {
     setEstado("cargando numpy + matplotlib (~40 MB)…");
     await pyodide.loadPackage(["matplotlib"]);
     pyodide.FS.mkdirTree("/lib");
+    pyodide.FS.mkdirTree("/lib/jenway67");   // <- FALTA creaba el padre del paquete
     pyodide.FS.mkdirTree("/card");
     await pyodide.runPythonAsync("import sys; sys.path.insert(0, '/lib')");
     // Instalar el núcleo desde el propio sitio (mismos archivos del repo)
@@ -87,8 +88,12 @@ async function iniciar() {
     const drv = await (await fetch("visor.py")).text();
     pyodide.FS.writeFile("/lib/visor.py", drv);
     await pyodide.runPythonAsync("import visor");
+    document.getElementById("carpeta").disabled = false;
+    document.getElementById("sueltos").disabled = false;
     setEstado("listo. Elige la carpeta de la tarjeta. ⬆");
   } catch (e) {
+    document.getElementById("carpeta").disabled = true;
+    document.getElementById("sueltos").disabled = true;
     setEstado("ERROR de inicio: " + e);
     console.error(e);
   }
@@ -106,7 +111,8 @@ async function cargarTodos(archivos) {
     }
     detalle.textContent = archivos.length + " archivo(s) montados.";
     setEstado("decodificando…");
-    const js = await pyodide.runPythonAsync("visor.indice_json()");
+    // __import__ hace el import aislado: no depende de ningún estado previo
+    const js = await pyodide.runPythonAsync("__import__('visor').indice_json()");
     pintar(JSON.parse(js));
     setEstado("hecho.");
   } catch (e) {
@@ -175,7 +181,7 @@ async function graficar(btn) {
   btn.disabled = true;
   setEstado("graficando " + loc + "…");
   try {
-    const codigo = `visor.grafica_json(${JSON.stringify(loc)}, ${JSON.stringify(modo)})`;
+    const codigo = `__import__('visor').grafica_json(${JSON.stringify(loc)}, ${JSON.stringify(modo)})`;
     const js = await pyodide.runPythonAsync(codigo);
     const r = JSON.parse(js);
     if (r.error) { grafico.innerHTML = `<span class="err">⚠ ${r.error}</span>`; }
