@@ -229,8 +229,8 @@ function pintarLista(){
     side.querySelectorAll(".muestra").forEach(x=>x.classList.toggle("on",x===el));
     renderVista();
   });
-  // panel de procesado solo para spectum
-  $("#proc-col").style.display = indice.metodos[metAct] && indice.metodos[metAct].modo==="spectrum" ? "" : "none";
+  // panel de procesado solo para spectum (puede no existir aun: #main se crea en renderVista)
+  const pc=$("#proc-col"); if(pc){ pc.style.display = indice.metodos[metAct] && indice.metodos[metAct].modo==="spectrum" ? "" : "none"; }
 }
 
 // ---------------- vista ----------------
