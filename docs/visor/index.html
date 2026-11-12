@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visor Jenway 6705 (Pyodide)</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, Segoe UI, Roboto, sans-serif; margin: 0; background: #101418; color: #e6e6e6; }
+  header { background: linear-gradient(135deg, #16202b, #101418); border-bottom: 1px solid #2a3543; padding: 1rem 1.2rem; }
+  h1 { margin: 0; font-size: 1.2rem; display: inline-block; }
+  #estado { color: #9aa7b4; font-size: .85rem; margin-left: 1rem; }
+  main { max-width: 960px; margin: 0 auto; padding: 1.2rem; }
+  .controles { background: #161d26; border: 1px solid #2a3543; border-radius: 10px; padding: .9rem 1.1rem; margin-bottom: 1rem; }
+  .controles label { display: block; margin: .4rem 0; }
+  .metodo { border: 1px solid #2a3543; border-radius: 10px; margin: .8rem 0; overflow: hidden; }
+  .metodo .cab { background: #1b2530; padding: .55rem .9rem; font-weight: 600; }
+  .metodo .modo { color: #f0a24b; text-transform: uppercase; font-size: .75rem; letter-spacing: .04em; }
+  table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  td { padding: .35rem .6rem; border-top: 1px solid #222c38; vertical-align: top; }
+  td.loc { color: #9aa7b4; white-space: nowrap; font-family: ui-monospace, Consolas, monospace; }
+  button { background: #e08a2e; color: #101418; border: 0; border-radius: 6px; padding: .3rem .7rem; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: wait; }
+  #grafico { margin: 1rem 0; text-align: center; min-height: 40px; }
+  #grafico img { max-width: 100%; border-radius: 8px; border: 1px solid #2a3543; }
+  .vacio { color: #9aa7b4; padding: 1.4rem; text-align: center; }
+  .err { color: #f0a24b; }
+  footer { color: #6b7a89; font-size: .78rem; padding: 1rem 1.2rem 2.5rem; max-width: 960px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Visor — Jenway 6705</h1>
+  <span id="estado">cargando Python…</span>
+</header>
+<main>
+  <div class="controles">
+    <label>
+      <b>1. Elige la carpeta copiada de la tarjeta</b>
+      <input id="carpeta" type="file" webkitdirectory directory multiple>
+    </label>
+    <label>
+      <b>2. …o suelta archivos sueltos</b> (<code>.JWB</code>/<code>.JWX</code>/<code>.JWU</code>/<code>.TXT</code>)
+      <input id="sueltos" type="file" multiple>
+    </label>
+    <div style="color:#9aa7b4;font-size:.82rem" id="detalle"></div>
+  </div>
+  <div id="resultado"><div class="vacio">Elige una carpeta para empezar (los datos NO salen de tu equipo).</div></div>
+  <div id="grafico"></div>
+</main>
+<footer>
+  Los parsers son los mismos del proyecto (jenway67), ejecutándose en tu navegador con Pyodide.
+  La primera carga descarga el intérprete ~10 MB + matplotlib ~40 MB desde CDN (queda en caché).
+  No se envía nada a ningún servidor.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+<script>
+"use strict";
+let pyodide = null;
+
+const estado = document.getElementById("estado");
+const detalle = document.getElementById("detalle");
+const resultado = document.getElementById("resultado");
+const grafico = document.getElementById("grafico");
+
+function setEstado(t) { estado.textContent = t; }
+
+const MODULOS = ["__init__.py","models.py","utilidades.py","parser_jwb.py","parser_jwx.py",
+                 "parser_jwu.py","parser_txt.py","reader.py","exportar.py","excel.py",
+                 "informe.py","analisis.py","sesion.py","adaptador_txt.py","procesado.py"];
+
+async function iniciar() {
+  try {
+    setEstado("cargando Pyodide (~10 MB)…");
+    pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/" });
+    setEstado("cargando numpy + matplotlib (~40 MB)…");
+    await pyodide.loadPackage(["matplotlib"]);
+    pyodide.FS.mkdirTree("/lib");
+    pyodide.FS.mkdirTree("/card");
+    await pyodide.runPythonAsync("import sys; sys.path.insert(0, '/lib')");
+    // Instalar el núcleo desde el propio sitio (mismos archivos del repo)
+    for (const f of MODULOS) {
+      const txt = await (await fetch("jenway67/" + f)).text();
+      pyodide.FS.writeFile("/lib/jenway67/" + f, txt);
+    }
+    const drv = await (await fetch("visor.py")).text();
+    pyodide.FS.writeFile("/lib/visor.py", drv);
+    await pyodide.runPythonAsync("import visor");
+    setEstado("listo. Elige la carpeta de la tarjeta. ⬆");
+  } catch (e) {
+    setEstado("ERROR de inicio: " + e);
+    console.error(e);
+  }
+}
+
+async function cargarTodos(archivos) {
+  grafico.innerHTML = "";
+  setEstado("montando archivos…");
+  try {
+    for (const f of archivos) {
+      const rel = (f.webkitRelativePath || f.name).replace(/\\/g, "/");
+      const ruta = "/card/" + rel;
+      pyodide.FS.mkdirTree(ruta.slice(0, ruta.lastIndexOf("/")) || "/card");
+      pyodide.FS.writeFile(ruta, new Uint8Array(await f.arrayBuffer()));
+    }
+    detalle.textContent = archivos.length + " archivo(s) montados.";
+    setEstado("decodificando…");
+    const js = await pyodide.runPythonAsync("visor.indice_json()");
+    pintar(JSON.parse(js));
+    setEstado("hecho.");
+  } catch (e) {
+    setEstado("ERROR al cargar: " + e);
+    console.error(e);
+  }
+}
+
+function pintar(datos) {
+  const cont = document.createElement("div");
+  if (!datos.metodos.length) {
+    cont.innerHTML = '<div class="vacio">No se encontró un índice válido (.JWX/.JWU). ' +
+                     '¿Es esta la carpeta copiada de la tarjeta?</div>';
+    resultado.replaceChildren(cont);
+    return;
+  }
+  const cab = document.createElement("p");
+  cab.style.color = "#9aa7b4";
+  cab.textContent = "Usuarios: " + (datos.usuarios.join(", ") || "(ninguno)") +
+                    " · " + datos.metodos.length + " métodos";
+  cont.appendChild(cab);
+  for (const m of datos.metodos) {
+    const caja = document.createElement("div");
+    caja.className = "metodo";
+    const cabecera = document.createElement("div");
+    cabecera.className = "cab";
+    cabecera.innerHTML = `<span class="modo">${m.modo}</span> ${m.nombre} ` +
+                         `<span style="color:#9aa7b4;font-weight:400">· ${m.usuario} · ${m.fecha}</span>`;
+    caja.appendChild(cabecera);
+    const tabla = document.createElement("table");
+    for (const s of m.muestras) {
+      const fila = document.createElement("tr");
+      const tdLoc = document.createElement("td");
+      tdLoc.className = "loc";
+      tdLoc.textContent = s.loc;
+      const tdRes = document.createElement("td");
+      if (s.error) { tdRes.innerHTML = `<span class="err">⚠ ${s.error}</span>`; }
+      else { tdRes.textContent = s.resumen; }
+      const tdBtn = document.createElement("td");
+      const btn = document.createElement("button");
+      btn.textContent = "Graficar";
+      btn.dataset.loc = s.loc;
+      btn.dataset.modo = m.modo;
+      btn.onclick = () => graficar(btn);
+      tdBtn.appendChild(btn);
+      fila.append(tdLoc, tdRes, tdBtn);
+      tabla.appendChild(fila);
+    }
+    if (!m.muestras.length) {
+      const fila = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 3;
+      td.className = "vacio";
+      td.textContent = "Sin muestras (método vacío).";
+      fila.appendChild(td);
+      tabla.appendChild(fila);
+    }
+    caja.appendChild(tabla);
+    cont.appendChild(caja);
+  }
+  resultado.replaceChildren(cont);
+}
+
+async function graficar(btn) {
+  const loc = btn.dataset.loc, modo = btn.dataset.modo;
+  btn.disabled = true;
+  setEstado("graficando " + loc + "…");
+  try {
+    const codigo = `visor.grafica_json(${JSON.stringify(loc)}, ${JSON.stringify(modo)})`;
+    const js = await pyodide.runPythonAsync(codigo);
+    const r = JSON.parse(js);
+    if (r.error) { grafico.innerHTML = `<span class="err">⚠ ${r.error}</span>`; }
+    else {
+      grafico.innerHTML = `<img alt="gráfica ${loc}" src="data:image/png;base64,${r.png}">`;
+    }
+    setEstado("hecho.");
+  } catch (e) {
+    setEstado("ERROR al graficar: " + e);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById("carpeta").addEventListener("change", (ev) => {
+  if (ev.target.files.length) cargarTodos(ev.target.files);
+});
+document.getElementById("sueltos").addEventListener("change", (ev) => {
+  if (ev.target.files.length) cargarTodos(ev.target.files);
+});
+
+iniciar();
+</script>
+</body>
+</html>

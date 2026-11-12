@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programa Maestro — Jenway 6705</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, Segoe UI, Roboto, sans-serif; margin: 0; background: #101418; color: #e6e6e6; }
+  header { background: linear-gradient(135deg, #16202b, #101418); border-bottom: 1px solid #2a3543; padding: 2.2rem 1.5rem 1.6rem; }
+  h1 { margin: 0; font-size: 1.6rem; }
+  .sub { color: #9aa7b4; margin-top: .4rem; }
+  main { max-width: 860px; margin: 0 auto; padding: 1.6rem 1.2rem 3rem; }
+  .tarjeta { background: #161d26; border: 1px solid #2a3543; border-radius: 10px; padding: 1.1rem 1.3rem; margin: 1rem 0; }
+  a { color: #f0a24b; text-decoration: none; } a:hover { text-decoration: underline; }
+  .boton { display: inline-block; background: #e08a2e; color: #101418; font-weight: 600; padding: .55rem 1rem; border-radius: 8px; }
+  img.shot { max-width: 100%; border-radius: 8px; border: 1px solid #2a3543; margin-top: .6rem; }
+  ul { padding-left: 1.2rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Programa Maestro — Jenway 6705</h1>
+  <div class="sub">Lector y analizador propio para el espectrofotómetro Jenway 6705 · reemplaza al 67-Series Software Suite</div>
+</header>
+<main>
+  <div class="tarjeta">
+    <h2 style="margin-top:0">🧪 Visor de datos en tu navegador</h2>
+    <p>Lee la carpeta copiada de la tarjeta del instrumento (<code>.JWB/.JWX/.JWU</code>) usando los
+    mismos parsers del programa — directamente en tu móvil o PC, sin instalar nada.
+    Elige la carpeta con el selector y verás los métodos decodificados.</p>
+    <a class="boton" href="visor/" target="_blank">Abrir el visor →</a>
+  </div>
+
+  <div class="tarjeta">
+    <h2 style="margin-top:0">📄 Documentación</h2>
+    <ul>
+      <li><a href="Especificacion_Formato_Jenway_6705.md">Especificación del formato de archivos</a> (formatos .JWB/.JWX/.JWU/.TXT validados contra el instrumento)</li>
+      <li><a href="guia-escaner.html">Guía del banco de pruebas RS-232</a> (protocolo serie verificado del 6705)</li>
+      <li><a href="plan_implementacion.md">Plan de implementación</a> (bitácora de fases: 0–4)</li>
+    </ul>
+  </div>
+
+  <div class="tarjeta">
+    <h2 style="margin-top:0">💻 El programa de escritorio</h2>
+    <p>La aplicación completa (PySide6) con procesado espectral, informe Excel y conexión RS-232
+    vive en el repositorio, junto con una <b>versión portable</b> (dos .exe, sin necesidad de Python).</p>
+    <a href="https://github.com/Yakat1/espectrofotometro-lector" target="_blank">github.com/Yakat1/espectrofotometro-lector →</a>
+    <div><img class="shot" src="ventana_oscuro.png" alt="Vista del Programa Maestro"></div>
+  </div>
+
+  <p style="color:#9aa7b4; font-size:.85rem">Proyecto propio de laboratorio · sin licencia pública.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Guía de ejecución · Banco de pruebas serie Jenway 6705</title>
+<style>
+  html,body{margin:0;padding:0;background:transparent;font-family:inherit;
+            color:var(--foreground,#e8e8e8)}
+  svg{display:block;width:100%;height:auto}
+  .caja{fill:var(--card,rgba(128,128,128,.07));stroke:var(--border,rgba(128,128,128,.35));stroke-width:1.5}
+  .dec{fill:var(--card,rgba(128,128,128,.07));stroke:var(--accent,#5aa9e6);stroke-width:2}
+  .fin{fill:var(--card,rgba(128,128,128,.07));stroke:var(--border,rgba(128,128,128,.35));stroke-width:3}
+  .t{fill:var(--foreground,#e8e8e8);font-size:15px;font-weight:600}
+  .m{fill:var(--muted-foreground,#9aa0a6);font-size:12px}
+  .k{fill:var(--foreground,#e8e8e8);font-size:13px;
+     font-family:ui-monospace,Consolas,"Courier New",monospace}
+  .a{fill:var(--accent,#5aa9e6);font-size:15px;font-weight:700}
+  .es{fill:var(--accent,#5aa9e6);font-size:12px;font-weight:700}
+  .et{fill:var(--muted-foreground,#9aa0a6);font-size:12px;font-weight:600}
+  .fl{stroke:var(--muted-foreground,#9aa0a6);stroke-width:1.6;fill:none}
+  .flh{fill:var(--muted-foreground,#9aa0a6)}
+  .sep{stroke:var(--border,rgba(128,128,128,.35));stroke-width:1;fill:none}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 760 1118" role="img"
+     aria-label="Diagrama de flujo: en qué orden correr el banco de pruebas serie del Jenway 6705">
+<defs>
+  <marker id="p" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="flh" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+
+<!-- ===================== COLUMNA IZQUIERDA: LA SECUENCIA ===================== -->
+<rect class="dec" x="20" y="8" width="430" height="54" rx="8"/>
+<text class="m" x="235" y="27" text-anchor="middle">Punto de partida</text>
+<text class="t" x="235" y="47" text-anchor="middle">Equipo encendido · cable USB · tarjeta insertada</text>
+
+<line class="fl" x1="235" y1="62" x2="235" y2="76" marker-end="url(#p)"/>
+
+<rect class="dec" x="20" y="78" width="430" height="104" rx="8"/>
+<text class="t" x="235" y="104" text-anchor="middle">¿Aparece algún puerto COM?</text>
+<text class="k" x="235" y="128" text-anchor="middle">Escanear_Serie.bat --listar</text>
+<text class="m" x="235" y="152" text-anchor="middle">el puerto solo existe con el equipo encendido</text>
+
+<line class="fl" x1="450" y1="130" x2="526" y2="130" marker-end="url(#p)"/>
+<text class="et" x="454" y="122">NO</text>
+<line class="fl" x1="235" y1="182" x2="235" y2="198" marker-end="url(#p)"/>
+<text class="et" x="241" y="196">SÍ</text>
+
+<rect class="caja" x="20" y="200" width="430" height="104" rx="8"/>
+<text class="t" x="40" y="226">1 · ¿Habla por su cuenta?</text>
+<text class="k" x="40" y="250">Escanear_Serie.bat --escuchar 60 --sin-sondas</text>
+<text class="m" x="40" y="274">Mientras corre: pulsa PRINT en el equipo, mete/saca la tarjeta.</text>
+<text class="m" x="40" y="292">No se envía nada: solo se escucha.</text>
+
+<line class="fl" x1="450" y1="252" x2="482" y2="252"/>
+<text class="es" x="454" y="244">SÍ</text>
+<line class="fl" x1="235" y1="304" x2="235" y2="318" marker-end="url(#p)"/>
+<text class="et" x="241" y="316">NO</text>
+
+<rect class="caja" x="20" y="320" width="430" height="132" rx="8"/>
+<text class="t" x="40" y="346">2 · Escaneo base  (15 configs × 11 sondas · ~1 min)</text>
+<text class="k" x="40" y="370">Escanear_Serie.bat</text>
+<text class="m" x="40" y="394">RESPUESTA → a la derecha · SILENCIO → sigue hacia abajo</text>
+<text class="m" x="40" y="414">SOLO ECO = es el lazo del chip, NO es una respuesta</text>
+<text class="m" x="40" y="436">NO SE PUDO ABRIR → cierra el otro programa (el puerto es exclusivo)</text>
+
+<line class="fl" x1="450" y1="388" x2="482" y2="388"/>
+<text class="es" x="454" y="380">SÍ</text>
+<line class="fl" x1="235" y1="452" x2="235" y2="466" marker-end="url(#p)"/>
+<text class="et" x="241" y="464">NO</text>
+
+<rect class="caja" x="20" y="468" width="430" height="86" rx="8"/>
+<text class="t" x="40" y="494">3a · Con handshake RTS/CTS  (~2 min)</text>
+<text class="k" x="40" y="518">Escanear_Serie.bat --flujo rtscts</text>
+<text class="m" x="40" y="540">Hay equipos que no contestan si falta el handshake.</text>
+
+<line class="fl" x1="450" y1="508" x2="482" y2="508"/>
+<text class="es" x="454" y="500">SÍ</text>
+<line class="fl" x1="235" y1="554" x2="235" y2="568" marker-end="url(#p)"/>
+<text class="et" x="241" y="566">NO</text>
+
+<rect class="caja" x="20" y="570" width="430" height="104" rx="8"/>
+<text class="t" x="40" y="596">3b · Sondas de otros protocolos  (~4 min)</text>
+<text class="k" x="40" y="620">Escanear_Serie.bat --sondas ampliadas</text>
+<text class="m" x="40" y="642">Incluye XMODEM: la apuesta con mecanismo real, porque el</text>
+<text class="m" x="40" y="660">software OEM movía FICHEROS por este puerto.</text>
+
+<line class="fl" x1="450" y1="620" x2="482" y2="620"/>
+<text class="es" x="454" y="612">SÍ</text>
+<line class="fl" x1="235" y1="674" x2="235" y2="688" marker-end="url(#p)"/>
+<text class="et" x="241" y="686">NO</text>
+
+<rect class="caja" x="20" y="690" width="430" height="104" rx="8"/>
+<text class="t" x="40" y="716">3c · Exhaustivo  (~27 min)</text>
+<text class="k" x="40" y="740">Escanear_Serie.bat --completo --sondas ampliadas</text>
+<text class="m" x="40" y="762">132 configuraciones, por si la velocidad o la trama son</text>
+<text class="m" x="40" y="780">raras (7 bits, paridad, 2 de parada…).</text>
+
+<line class="fl" x1="450" y1="750" x2="482" y2="750"/>
+<text class="es" x="454" y="742">SÍ</text>
+<line class="fl" x1="235" y1="794" x2="235" y2="808" marker-end="url(#p)"/>
+<text class="et" x="241" y="806">NO</text>
+
+<rect class="caja" x="20" y="810" width="430" height="118" rx="8"/>
+<text class="t" x="40" y="838">4 · Agotar  (~30 min)</text>
+<text class="k" x="40" y="862">Escanear_Serie.bat --sondas ampliadas</text>
+<text class="k" x="40" y="880">                     --permitir-estado --barrido-bytes</text>
+<text class="m" x="40" y="904">XMODEM + *CLS + AT, y el barrido de 1 byte (0x00–0xFF):</text>
+<text class="m" x="40" y="922">cubre de golpe todo el espacio de órdenes de una letra.</text>
+
+<line class="fl" x1="450" y1="880" x2="482" y2="880"/>
+<text class="es" x="454" y="872">SÍ</text>
+<line class="fl" x1="235" y1="928" x2="235" y2="942" marker-end="url(#p)"/>
+<text class="et" x="241" y="940">NO</text>
+
+<rect class="fin" x="20" y="944" width="430" height="98" rx="8"/>
+<text class="t" x="40" y="972">SILENCIO en todo lo anterior</text>
+<text class="m" x="40" y="996">La vía serie queda CERRADA: es un negativo medido, y</text>
+<text class="m" x="40" y="1014">coherente con el manual (no documenta protocolo de control).</text>
+<text class="m" x="40" y="1032">Ahí se acaba: el .JWB sigue siendo la fuente de verdad.</text>
+
+<!-- Colector: cualquier respuesta va al panel de la derecha -->
+<line class="fl" x1="482" y1="252" x2="482" y2="880"/>
+<line class="fl" x1="482" y1="448" x2="526" y2="448" marker-end="url(#p)"/>
+
+<!-- ===================== COLUMNA DERECHA: RESULTADOS ===================== -->
+<rect class="caja" x="530" y="78" width="220" height="112" rx="8"/>
+<text class="a" x="545" y="104">SIN PUERTO</text>
+<text class="m" x="545" y="126">Equipo apagado, cable suelto o</text>
+<text class="m" x="545" y="142">driver FTDI.</text>
+<text class="k" x="545" y="160">VID_0403:PID_6001</text>
+<text class="m" x="545" y="180">Nada que sondear hasta resolverlo.</text>
+
+<rect class="caja" x="530" y="204" width="220" height="486" rx="8"/>
+<text class="a" x="545" y="232">★ SI CONTESTA</text>
+<text class="m" x="545" y="254">En cualquier paso, si sale una</text>
+<text class="m" x="545" y="270">RESPUESTA que no sea eco:</text>
+
+<text class="m" x="545" y="298">1 · Guarda el informe</text>
+<text class="m" x="545" y="314">    (se guarda solo en</text>
+<text class="m" x="545" y="330">    _escaneo_serie/)</text>
+
+<text class="m" x="545" y="358">2 · Anota la config exacta:</text>
+<text class="m" x="545" y="374">    velocidad, trama, flujo</text>
+<text class="m" x="545" y="390">    y la sonda que contestó</text>
+
+<text class="m" x="545" y="418">3 · Repite afinando:</text>
+<text class="k" x="545" y="436">    --puerto COM3</text>
+<text class="m" x="545" y="452">    con sondas alrededor de</text>
+<text class="m" x="545" y="468">    la que ganó</text>
+
+<text class="m" x="545" y="496">4 · Si la respuesta agota la</text>
+<text class="m" x="545" y="512">    ventana (mira espera_s),</text>
+<text class="k" x="545" y="530">    --ventana-larga 3m</text>
+
+<text class="m" x="545" y="558">5 · Con 2–3 intercambios ya</text>
+<text class="m" x="545" y="574">    documentados se escribe la</text>
+<text class="m" x="545" y="590">    especificación del protocolo</text>
+
+<line class="sep" x1="545" y1="612" x2="735" y2="612"/>
+<text class="m" x="545" y="636">Mándame el .json del informe:</text>
+<text class="m" x="545" y="652">de ahí saco el protocolo.</text>
+<text class="m" x="545" y="674">(el .json lleva todo byte crudo)</text>
+
+<rect class="caja" x="530" y="710" width="220" height="332" rx="8"/>
+<text class="t" x="545" y="738">Cuándo NO correrlo</text>
+<text class="m" x="545" y="766">Solo tiene sentido tras un</text>
+<text class="m" x="545" y="782">cambio REAL:</text>
+<text class="m" x="545" y="806">· otro cable o puerto</text>
+<text class="m" x="545" y="826">· otro firmware</text>
+<text class="m" x="545" y="846">· o si el fabricante</text>
+<text class="m" x="545" y="862">  por fin responde</text>
+
+<line class="sep" x1="545" y1="886" x2="735" y2="886"/>
+<text class="m" x="545" y="912">Si nada cambió, repetirlo da</text>
+<text class="m" x="545" y="928">exactamente el mismo silencio.</text>
+
+<line class="sep" x1="545" y1="952" x2="735" y2="952"/>
+<text class="m" x="545" y="978">El informe es EVIDENCIA: no</text>
+<text class="m" x="545" y="994">lo borres (lleva fecha y equipo).</text>
+<text class="m" x="545" y="1018">Cada corrida se puede comparar</text>
+<text class="m" x="545" y="1034">con la anterior.</text>
+
+<!-- ===================== PIE ===================== -->
+<text class="m" x="20" y="1074">Se va de lo barato y probable a lo exhaustivo: no saltes al paso 4 sin agotar el 1–3.</text>
+<text class="m" x="20" y="1092">Los tiempos son los de la corrida por defecto; el propio programa los estima al arrancar.</text>
+</svg>
+</body>
+</html>
