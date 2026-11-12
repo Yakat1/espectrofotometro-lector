@@ -3,206 +3,342 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Visor Jenway 6705 (Pyodide)</title>
+<title>Programa Maestro — Jenway 6705 (web)</title>
 <style>
   :root { color-scheme: dark; }
-  body { font-family: system-ui, Segoe UI, Roboto, sans-serif; margin: 0; background: #101418; color: #e6e6e6; }
-  header { background: linear-gradient(135deg, #16202b, #101418); border-bottom: 1px solid #2a3543; padding: 1rem 1.2rem; }
-  h1 { margin: 0; font-size: 1.2rem; display: inline-block; }
-  #estado { color: #9aa7b4; font-size: .85rem; margin-left: 1rem; }
-  main { max-width: 960px; margin: 0 auto; padding: 1.2rem; }
-  .controles { background: #161d26; border: 1px solid #2a3543; border-radius: 10px; padding: .9rem 1.1rem; margin-bottom: 1rem; }
-  .controles label { display: block; margin: .4rem 0; }
-  .metodo { border: 1px solid #2a3543; border-radius: 10px; margin: .8rem 0; overflow: hidden; }
-  .metodo .cab { background: #1b2530; padding: .55rem .9rem; font-weight: 600; }
-  .metodo .modo { color: #f0a24b; text-transform: uppercase; font-size: .75rem; letter-spacing: .04em; }
-  table { width: 100%; border-collapse: collapse; font-size: .86rem; }
-  td { padding: .35rem .6rem; border-top: 1px solid #222c38; vertical-align: top; }
-  td.loc { color: #9aa7b4; white-space: nowrap; font-family: ui-monospace, Consolas, monospace; }
-  button { background: #e08a2e; color: #101418; border: 0; border-radius: 6px; padding: .3rem .7rem; font-weight: 600; cursor: pointer; }
-  button:disabled { opacity: .45; cursor: wait; }
-  #grafico { margin: 1rem 0; text-align: center; min-height: 40px; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, Segoe UI, Roboto, sans-serif; margin: 0; background: #101418; color: #e6e6e6; height: 100vh; }
+  header { height: 56px; display: flex; align-items: center; gap: .8rem; padding: 0 1.1rem;
+           background: linear-gradient(135deg, #16202b, #101418); border-bottom: 1px solid #2a3543; }
+  h1 { font-size: 1.05rem; margin: 0; white-space: nowrap; }
+  #estado { color: #9aa7b4; font-size: .82rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn { background: #e08a2e; color: #101418; border: 0; border-radius: 7px; padding: .42rem .8rem;
+         font-weight: 600; font-size: .82rem; cursor: pointer; }
+  .btn:disabled { opacity: .4; cursor: wait; }
+  .btn.ghost { background: transparent; color: #e6e6e6; border: 1px solid #2a3543; }
+  .cuerpo { display: flex; height: calc(100vh - 56px); }
+  #side { width: 330px; min-width: 330px; border-right: 1px solid #2a3543; overflow-y: auto;
+          background: #131a22; padding: .6rem; }
+  .metodo { border: 1px solid #2a3543; border-radius: 8px; padding: .5rem .65rem; margin-bottom: .45rem;
+            cursor: pointer; }
+  .metodo:hover { border-color: #e08a2e; }
+  .metodo.sel { border-color: #e08a2e; background: #1c2632; }
+  .chip { display: inline-block; font-size: .66rem; text-transform: uppercase; letter-spacing: .05em;
+          padding: .12rem .45rem; border-radius: 5px; margin-right: .4rem; color: #101418; font-weight: 700; }
+  .modo-photometrics{background:#7fb5e0}.modo-spectrum{background:#e08a2e}.modo-multi{background:#7ac98e}
+  .modo-kinetics{background:#d98ac2}.modo-quantitation{background:#e5c07b}
+  .mn { font-weight: 600; font-size: .86rem; }
+  .mmeta { color: #7f8c99; font-size: .72rem; margin-top: .15rem; }
+  .muestras { margin-top: .4rem; }
+  .muestra { font-family: ui-monospace, Consolas, monospace; font-size: .72rem; color: #9aa7b4;
+             padding: .18rem .45rem; border-radius: 5px; margin: .12rem 0; cursor: pointer; }
+  .muestra.on { color: #e08a2e; }
+  #main { flex: 1; overflow-y: auto; padding: 1rem 1.3rem 2.5rem; }
+  .resumen { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .7rem; }
+  .loc { font-family: ui-monospace, Consolas, monospace; color: #9aa7b4; }
+  .aviso { background: #3a2416; border: 1px solid #8a5b22; color: #e8c48a; border-radius: 6px;
+           padding: .3rem .7rem; font-size: .8rem; }
+  .caja { background: #161d26; border: 1px solid #2a3543; border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; }
+  .caja h3 { margin: 0 0 .5rem; font-size: .92rem; color: #f0a24b; }
+  #grafico { text-align: center; }
   #grafico img { max-width: 100%; border-radius: 8px; border: 1px solid #2a3543; }
-  .vacio { color: #9aa7b4; padding: 1.4rem; text-align: center; }
-  .err { color: #f0a24b; }
-  footer { color: #6b7a89; font-size: .78rem; padding: 1rem 1.2rem 2.5rem; max-width: 960px; margin: 0 auto; }
+  .analisis { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .kv { background: #1b2530; border: 1px solid #2a3543; border-radius: 7px; padding: .35rem .6rem; font-size: .8rem; }
+  .kv b { color: #f0a24b; font-weight: 600; margin-right: .35rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  th, td { text-align: left; padding: .34rem .5rem; border-bottom: 1px solid #202b37; }
+  th { color: #9aa7b4; position: sticky; top: 0; background: #161d26; }
+  .tabla-wrap { max-height: 320px; overflow: auto; border: 1px solid #2a3543; border-radius: 8px; }
+  .nota { color: #6b7a89; font-size: .75rem; margin-top: .3rem; }
+  #proc-op { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .6rem; }
+  .op { border: 1px solid #2a3543; border-radius: 8px; padding: .5rem .6rem; }
+  .op .tt { font-size: .82rem; font-weight: 600; }
+  .op .ayuda { color: #7f8c99; font-size: .72rem; margin: .15rem 0 .4rem; }
+  .op .par { display: flex; align-items: center; gap: .4rem; margin: .25rem 0; font-size: .75rem; }
+  .op input, .op select { background: #101418; color: #e6e6e6; border: 1px solid #2a3543; border-radius: 5px;
+                          padding: .22rem .4rem; font-size: .75rem; flex: 1; min-width: 60px; }
+  .op button { background: #1b6d4b; color: #d7ffe9; border: 0; border-radius: 6px; padding: .3rem .7rem; font-weight: 600; cursor: pointer; }
+  #cadena { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; font-size: .8rem; margin-top: .6rem; }
+  .paso { background: #1c2632; border: 1px solid #2a3543; border-radius: 6px; padding: .3rem .6rem; }
+  #cadena .btn { padding: .3rem .6rem; }
+  footer { color: #55626f; font-size: .72rem; padding: .4rem 1.2rem; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Visor — Jenway 6705</h1>
+  <h1>Programa Maestro — Jenway 6705</h1>
   <span id="estado">cargando Python…</span>
+  <label class="btn" style="display:inline-block">Cargar tarjeta
+    <input id="f_carpeta" type="file" webkitdirectory directory multiple style="display:none" disabled>
+  </label>
+  <button class="btn ghost" id="b_csv" disabled>CSV de la vista</button>
+  <button class="btn ghost" id="b_png" disabled>Figura PNG</button>
+  <button class="btn ghost" id="b_xlsx" disabled>Informe Excel</button>
 </header>
-<main>
-  <div class="controles">
-    <label>
-      <b>1. Elige la carpeta copiada de la tarjeta</b>
-      <input id="carpeta" type="file" webkitdirectory directory multiple disabled>
-    </label>
-    <label>
-      <b>2. …o suelta archivos sueltos</b> (<code>.JWB</code>/<code>.JWX</code>/<code>.JWU</code>/<code>.TXT</code>)
-      <input id="sueltos" type="file" multiple disabled>
-    </label>
-    <div style="color:#9aa7b4;font-size:.82rem" id="detalle"></div>
-  </div>
-  <div id="resultado"><div class="vacio">Elige una carpeta para empezar (los datos NO salen de tu equipo).</div></div>
-  <div id="grafico"></div>
-</main>
-<footer>
-  Los parsers son los mismos del proyecto (jenway67), ejecutándose en tu navegador con Pyodide.
-  La primera carga descarga el intérprete ~10 MB + matplotlib ~40 MB desde CDN (queda en caché).
-  No se envía nada a ningún servidor.
-</footer>
+<div class="cuerpo">
+  <nav id="side"><div class="nota" style="padding:.6rem">Sin tarjeta cargada. Elige "Cargar tarjeta" arriba (los datos no salen de tu equipo).</div></nav>
+  <main id="main"><div class="caja"><h3>Bienvenido</h3>
+    <p style="color:#9aa7b4">Sube la carpeta copiada de la tarjeta del 6705 (<code>.JWB/.JWX/.JWU</code>).
+    Se listarán los métodos; haz clic en uno y luego en alguna de sus muestras. Podrás analizar, procesar
+    espectros y exportar CSV / informe Excel. La conexión física (RS-232) sigue siendo del programa de escritorio.</p>
+  </div></main>
+</div>
+<footer>Motor Python (Pyodide) con los parsers validados del proyecto jenway67. La primera carga descarga el intérprete y bibliotecas (~60 MB, queda en caché).</footer>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
 <script>
 "use strict";
-let pyodide = null;
+let pyodide=null, catalogo=null, indice=null;
+let metAct=-1, mueAct=null, cadena=[];   // método seleccionado, muestra, cadena de procesado
+let ultimaVista=null;                    // último {tabla, figura_b64, resumen} para CSV/PNG
 
-const estado = document.getElementById("estado");
-const detalle = document.getElementById("detalle");
-const resultado = document.getElementById("resultado");
-const grafico = document.getElementById("grafico");
+const $=s=>document.querySelector(s);
+const estado=e=>{ const el=$("#estado"); el.textContent=e; };
+const esModo=m=>m==="photometrics"?"photometrics":m;
 
-function setEstado(t) { estado.textContent = t; }
+const MODULOS=["__init__.py","models.py","utilidades.py","parser_jwb.py","parser_jwx.py",
+  "parser_jwu.py","parser_txt.py","reader.py","analisis.py","procesado.py",
+  "graficos.py","excel.py","informe.py","exportar.py","sesion.py","adaptador_txt.py"];
 
-const MODULOS = ["__init__.py","models.py","utilidades.py","parser_jwb.py","parser_jwx.py",
-                 "parser_jwu.py","parser_txt.py","reader.py","exportar.py","excel.py",
-                 "informe.py","analisis.py","sesion.py","adaptador_txt.py","procesado.py"];
-
-async function iniciar() {
-  try {
-    setEstado("cargando Pyodide (~10 MB)…");
-    pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/" });
-    setEstado("cargando numpy + matplotlib (~40 MB)…");
-    await pyodide.loadPackage(["matplotlib"]);
-    pyodide.FS.mkdirTree("/lib");
-    pyodide.FS.mkdirTree("/lib/jenway67");   // <- FALTA creaba el padre del paquete
-    pyodide.FS.mkdirTree("/card");
-    await pyodide.runPythonAsync("import sys; sys.path.insert(0, '/lib')");
-    // Instalar el núcleo desde el propio sitio (mismos archivos del repo)
-    for (const f of MODULOS) {
-      const txt = await (await fetch("jenway67/" + f)).text();
-      pyodide.FS.writeFile("/lib/jenway67/" + f, txt);
+async function iniciar(){
+  try{
+    estado("cargando Pyodide (~10 MB)…");
+    pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.5/full/"});
+    estado("cargando numpy, matplotlib, openpyxl + pillow (~50 MB)…");
+    await pyodide.loadPackage(["matplotlib","openpyxl","pillow"]);
+    pyodide.FS.mkdirTree("/lib"); pyodide.FS.mkdirTree("/lib/jenway67"); pyodide.FS.mkdirTree("/card");
+    await pyodide.runPythonAsync("import sys; sys.path.insert(0,'/lib')");
+    for(const f of MODULOS){
+      const txt=await (await fetch("jenway67/"+f)).text();
+      pyodide.FS.writeFile("/lib/jenway67/"+f, txt);
     }
-    const drv = await (await fetch("visor.py")).text();
-    pyodide.FS.writeFile("/lib/visor.py", drv);
+    pyodide.FS.writeFile("/lib/visor.py", await (await fetch("visor.py")).text());
     await pyodide.runPythonAsync("import visor");
-    document.getElementById("carpeta").disabled = false;
-    document.getElementById("sueltos").disabled = false;
-    setEstado("listo. Elige la carpeta de la tarjeta. ⬆");
-  } catch (e) {
-    document.getElementById("carpeta").disabled = true;
-    document.getElementById("sueltos").disabled = true;
-    setEstado("ERROR de inicio: " + e);
-    console.error(e);
-  }
+    catalogo=JSON.parse(await pyodide.runPythonAsync("__import__('visor').catalogo_json()"));
+    construirProcesado();
+    $("#f_carpeta").disabled=false;
+    estado("listo. Carga la tarjeta. ⬆");
+  }catch(e){ estado("ERROR de inicio: "+e); console.error(e); }
 }
 
-async function cargarTodos(archivos) {
-  grafico.innerHTML = "";
-  setEstado("montando archivos…");
-  try {
-    for (const f of archivos) {
-      const rel = (f.webkitRelativePath || f.name).replace(/\\/g, "/");
-      const ruta = "/card/" + rel;
-      pyodide.FS.mkdirTree(ruta.slice(0, ruta.lastIndexOf("/")) || "/card");
+// ---------------- procesado (UI generada del catálogo) ----------------
+function construirProcesado(){
+  if(!document.getElementById("proc")){ return; }
+  const box=$("#proc-col");
+  if(!box) return;
+  let html=`<h3>Procesado espectral</h3><div id="proc-op">`;
+  for(const g of catalogo.grupos){
+    for(const clave of Object.keys(catalogo.operaciones)){
+      const op=catalogo.operaciones[clave];
+      if(op.grupo!==g) continue;
+      html+=`<div class="op" data-clave="${clave}"><div class="tt">${op.etiqueta}</div>`;
+      if(op.ayuda) html+=`<div class="ayuda">${op.ayuda}</div>`;
+      for(const p of op.parametros){
+        const id=`p_${clave}_${p.nombre}`;
+        html+=`<div class="par"><label>${p.etiqueta}</label>`;
+        if(p.tipo==="lista"){
+          html+=`<select id="${id}">`+p.opciones.map(o=>`<option ${String(o)===String(p.defecto)?"selected":""}>${o}</option>`).join("")+`</select>`;
+        }else{
+          const ph = (p.tipo==="opcional_float" && p.defecto==="") ? "vacío" : p.defecto;
+          const atr = p.minimo!=null?` min="${p.minimo}"`:"";
+          const atr2 = p.maximo!=null?` max="${p.maximo}"`:"";
+          html+=`<input id="${id}" type="${p.tipo==="int"?"number":"number"}" step="any" value="${ph}" placeholder="${ph}"${atr}${atr2}>`;
+        }
+        html+=`</div>`;
+      }
+      html+=`<button>Aplicar</button></div>`;
+    }
+  }
+  html+=`</div><div id="cadena"></div>`;
+  box.innerHTML=html;
+  box.querySelectorAll(".op button").forEach(b=>b.onclick=()=>aplicarOp(b.closest(".op")));
+}
+
+function leerParams(op){
+  const out={};
+  op.querySelectorAll("[id^=p_]").forEach(inp=>{
+    const nom=inp.id.split("_").slice(2).join("_");
+    let val=inp.value.trim();
+    if(val==="" ){ out[nom]=null; return; }
+    out[nom]= inp.tagName==="SELECT" ? val : (inp.type==="number" ? Number(val) : val);
+  });
+  return out;
+}
+function aplicarOp(op){
+  const clave=op.dataset.clave;
+  const params=leerParams(op);
+  cadena.push({clave, parametros:params});
+  pintarCadena(); renderVista();
+}
+function pintarCadena(){
+  const c=$("#cadena"); if(!c) return;
+  c.innerHTML = cadena.length
+    ? cadena.map((p,i)=>{ const op=catalogo.operaciones[p.clave];
+        const det=Object.entries(p.parametros).filter(([,v])=>v!=null&&v!=="").map(([k,v])=>`${k}=${v}`).join(", ");
+        return `<span class="paso" title="${op.ayuda}">${i+1}. ${op.etiqueta}${det?" ("+det+")":""}</span>`; }).join("")
+        +` <button class="btn ghost" id="b_undo">Deshacer</button><button class="btn ghost" id="b_cl">Limpiar</button>`
+    : `<span class="nota">Sin procesar. Aplica operaciones que se acumulan + Deshacer.</span>`;
+  const u=$("#b_undo"); if(u) u.onclick=()=>{cadena.pop(); pintarCadena(); renderVista();};
+  const cl=$("#b_cl"); if(cl) cl.onclick=()=>{cadena=[]; pintarCadena(); renderVista();};
+}
+
+// ---------------- carga de la tarjeta ----------------
+async function montar(archivos){
+  estado("montando "+archivos.length+" archivos…");
+  try{
+    for(const f of archivos){
+      const rel=(f.webkitRelativePath||f.name).replace(/\\/g,"/");
+      const ruta="/card/"+rel;
+      pyodide.FS.mkdirTree(ruta.slice(0,ruta.lastIndexOf("/"))||"/card");
       pyodide.FS.writeFile(ruta, new Uint8Array(await f.arrayBuffer()));
     }
-    detalle.textContent = archivos.length + " archivo(s) montados.";
-    setEstado("decodificando…");
-    // __import__ hace el import aislado: no depende de ningún estado previo
-    const js = await pyodide.runPythonAsync("__import__('visor').indice_json()");
-    pintar(JSON.parse(js));
-    setEstado("hecho.");
-  } catch (e) {
-    setEstado("ERROR al cargar: " + e);
-    console.error(e);
-  }
+    estado("decodificando índice…");
+    indice=JSON.parse(await pyodide.runPythonAsync("__import__('visor').indice_json()"));
+    pintarLista();
+    estado("hecho.");
+  }catch(e){ estado("ERROR al montar: "+e); console.error(e); }
 }
 
-function pintar(datos) {
-  const cont = document.createElement("div");
-  if (!datos.metodos.length) {
-    cont.innerHTML = '<div class="vacio">No se encontró un índice válido (.JWX/.JWU). ' +
-                     '¿Es esta la carpeta copiada de la tarjeta?</div>';
-    resultado.replaceChildren(cont);
-    return;
-  }
-  const cab = document.createElement("p");
-  cab.style.color = "#9aa7b4";
-  cab.textContent = "Usuarios: " + (datos.usuarios.join(", ") || "(ninguno)") +
-                    " · " + datos.metodos.length + " métodos";
-  cont.appendChild(cab);
-  for (const m of datos.metodos) {
-    const caja = document.createElement("div");
-    caja.className = "metodo";
-    const cabecera = document.createElement("div");
-    cabecera.className = "cab";
-    cabecera.innerHTML = `<span class="modo">${m.modo}</span> ${m.nombre} ` +
-                         `<span style="color:#9aa7b4;font-weight:400">· ${m.usuario} · ${m.fecha}</span>`;
-    caja.appendChild(cabecera);
-    const tabla = document.createElement("table");
-    for (const s of m.muestras) {
-      const fila = document.createElement("tr");
-      const tdLoc = document.createElement("td");
-      tdLoc.className = "loc";
-      tdLoc.textContent = s.loc;
-      const tdRes = document.createElement("td");
-      if (s.error) { tdRes.innerHTML = `<span class="err">⚠ ${s.error}</span>`; }
-      else { tdRes.textContent = s.resumen; }
-      const tdBtn = document.createElement("td");
-      const btn = document.createElement("button");
-      btn.textContent = "Graficar";
-      btn.dataset.loc = s.loc;
-      btn.dataset.modo = m.modo;
-      btn.onclick = () => graficar(btn);
-      tdBtn.appendChild(btn);
-      fila.append(tdLoc, tdRes, tdBtn);
-      tabla.appendChild(fila);
-    }
-    if (!m.muestras.length) {
-      const fila = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 3;
-      td.className = "vacio";
-      td.textContent = "Sin muestras (método vacío).";
-      fila.appendChild(td);
-      tabla.appendChild(fila);
-    }
-    caja.appendChild(tabla);
-    cont.appendChild(caja);
-  }
-  resultado.replaceChildren(cont);
+function pintarLista(){
+  const side=$("#side");
+  if(!indice.metodos.length){ side.innerHTML=`<div class="nota" style="padding:.6rem">No se encontró un índice válido (.JWX). ¿Es la carpeta copiada de la tarjeta?</div>`; return; }
+  let html=`<div class="nota" style="padding:.3rem .6rem .6rem">Usuarios: ${indice.usuarios.join(", ")||"(ninguno)"} · ${indice.metodos.length} métodos</div>`;
+  indice.metodos.forEach((m,i)=>{
+    html+=`<div class="metodo${i===metAct?" sel":""}" data-i="${i}">
+      <span class="chip modo-${esModo(m.modo)}">${m.modo}</span><span class="mn">${m.nombre}</span>
+      <div class="mmeta">${m.usuario} · ${m.fecha} · ${m.muestras.length} muestra(s)</div>
+      <div class="muestras" style="display:${i===metAct?"block":"none"}">
+        ${m.muestras.slice(0,8).map(l=>`<div class="muestra${l===mueAct?" on":""}" data-loc="${encodeURIComponent(l)}">${l}</div>`).join("")}
+        ${m.muestras.length>8?`<div class="nota">+${m.muestras.length-8} más</div>`:""}
+      </div></div>`;
+  });
+  side.innerHTML=html;
+  side.querySelectorAll(".metodo").forEach(el=>el.onclick=()=>{
+    metAct=+el.dataset.i; mueAct=null; cadena=[];
+    const m=indice.metodos[metAct];
+    mueAct = m.modo==="photometrics" ? m.muestras[0] : m.muestras[0];
+    pintarLista(); renderVista();
+  });
+  side.querySelectorAll(".muestra").forEach(el=>el.onclick=(ev)=>{
+    ev.stopPropagation(); mueAct=decodeURIComponent(el.dataset.loc); cadena=[];
+    side.querySelectorAll(".muestra").forEach(x=>x.classList.toggle("on",x===el));
+    renderVista();
+  });
+  // panel de procesado solo para spectum
+  $("#proc-col").style.display = indice.metodos[metAct] && indice.metodos[metAct].modo==="spectrum" ? "" : "none";
 }
 
-async function graficar(btn) {
-  const loc = btn.dataset.loc, modo = btn.dataset.modo;
-  btn.disabled = true;
-  setEstado("graficando " + loc + "…");
-  try {
-    const codigo = `__import__('visor').grafica_json(${JSON.stringify(loc)}, ${JSON.stringify(modo)})`;
-    const js = await pyodide.runPythonAsync(codigo);
-    const r = JSON.parse(js);
-    if (r.error) { grafico.innerHTML = `<span class="err">⚠ ${r.error}</span>`; }
-    else {
-      grafico.innerHTML = `<img alt="gráfica ${loc}" src="data:image/png;base64,${r.png}">`;
-    }
-    setEstado("hecho.");
-  } catch (e) {
-    setEstado("ERROR al graficar: " + e);
-  } finally {
-    btn.disabled = false;
-  }
+// ---------------- vista ----------------
+async function renderVista(){
+  const m=indice.metodos[metAct]; if(!m||!mueAct){ return; }
+  const esPhoto = m.modo==="photometrics";
+  const payload={loc:mueAct, modo:m.modo,
+                 locs: esPhoto ? m.muestras : undefined,
+                 reglas: m.modo==="spectrum" ? cadena : []};
+  estado("calculando…");
+  try{
+    const js=await pyodide.runPythonAsync("__import__('visor').vista_json("+JSON.stringify(JSON.stringify(payload))+")");
+    const v=JSON.parse(js);
+    ultimaVista=v;
+    $("#main").innerHTML=`
+      <div class="resumen">
+        <span class="chip modo-${esModo(v.modo)}">${v.modo}</span>
+        <span class="loc">${v.loc}</span><span>${v.resumen}</span>
+        ${v.avisos.map(a=>`<span class="aviso">⚠ ${a}</span>`).join("")}
+      </div>
+      <div class="caja"><h3>Gráfica</h3><div id="grafico">${v.figura_b64?`<img alt="" src="data:image/png;base64,${v.figura_b64}">`:"<span class='nota'>sin figura</span>"}</div></div>
+      <div class="caja"><h3>Análisis</h3><div class="analisis" id="ana"></div></div>
+      <div class="caja"><h3>Tabla de la vista</h3><div class="tabla-wrap"><table id="tabla"></table></div>
+        <div class="nota">Primeras 300 filas en pantalla; la tabla completa en "CSV de la vista".</div></div>
+      <div class="caja" id="proc-collapse" style="display:${v.modo==="spectrum"?"":"none"}">
+        <div id="proc-col" style="display:${v.modo==="spectrum"?"":"none"}"><div class="nota">generando panel…</div></div>
+        <div id="proc" style="display:none"></div>
+      </div>`;
+    if(v.modo==="spectrum"){ construirProcesado(); pintarCadena(); }
+    pintarAnalisis(v);
+    pintarTabla(v.tabla,300);
+    $("#b_csv").disabled=false; $("#b_png").disabled=!!(!v.figura_b64); $("#b_xlsx").disabled=false;
+    estado("hecho.");
+  }catch(e){ estado("ERROR: "+e); console.error(e); }
 }
 
-document.getElementById("carpeta").addEventListener("change", (ev) => {
-  if (ev.target.files.length) cargarTodos(ev.target.files);
-});
-document.getElementById("sueltos").addEventListener("change", (ev) => {
-  if (ev.target.files.length) cargarTodos(ev.target.files);
-});
+function pintarAnalisis(v){
+  const a=v.analisis, box=$("#ana"); if(!box) return; let h="";
+  const kv=(k,val)=> h+=`<span class="kv"><b>${k}</b>${val}</span>`;
+  if(v.modo==="spectrum"){
+    kv("Área total", a.area_total?.toFixed(4));
+    kv("Máx", a.stats.max!=null?a.stats.max.toFixed(4):"—"); kv("Mín", a.stats.min!=null?a.stats.min.toFixed(4):"—");
+    kv("Media", a.stats.media!=null?a.stats.media.toFixed(4):"—"); kv("SD", a.stats.sd!=null?a.stats.sd.toFixed(4):"—");
+    kv("Procesado", a.procesado);
+    if(a.picos.length){
+      h+=`<div style="width:100%"></div>`;
+      h+=`<table style="max-width:520px"><tr><th>Pico/Vale λ (nm)</th><th>Abs</th><th>Tipo</th><th>Prominencia</th><th>FWHM (nm)</th></tr>`;
+      for(const p of a.picos) h+=`<tr><td>${p.wl.toFixed(1)}</td><td>${p.abs.toFixed(4)}</td><td>${p.tipo}</td><td>${p.prominencia.toFixed(4)}</td><td>${p.fwhm!=null?p.fwhm.toFixed(2):"—"}</td></tr>`;
+      h+=`</table>`;
+    } else h+=`<span class="kv">Picos: —</span>`;
+  } else if(v.modo==="kinetics"){
+    const c=a.cinetica;
+    kv("Pendiente (rate)", c.rate!=null?c.rate.toFixed(5):"—"); kv("Δ total", c.delta_total!=null?c.delta_total.toFixed(4):"—");
+    kv("Inicial", c.inicial!=null?c.inicial.toFixed(4):"—"); kv("Final", c.final!=null?c.final.toFixed(4):"—");
+    kv("N", c.n); kv("Media", c.media!=null?c.media.toFixed(4):"—"); kv("Máx", c.max!=null?c.max.toFixed(4):"—"); kv("Mín", c.min!=null?c.min.toFixed(4):"—");
+  } else if(v.modo==="quantitation"){
+    const c=a.curva;
+    kv("C° (interp.)", c.conc_interp!=null?c.conc_interp.toFixed(4):"—");
+    kv("Lineal r²", c.lineal_r2!=null?c.lineal_r2.toFixed(4):"—"); kv("Cuadrático r²", c.cuadratico_r2!=null?c.cuadratico_r2.toFixed(4):"—");
+    if(c.lineal_pred!=null) kv("C° lineal", c.lineal_pred.toFixed(4));
+    if(c.cuadratico_pred!=null) kv("C° cuadrático", c.cuadratico_pred.toFixed(4));
+  } else if(v.modo==="multi"){
+    const c=a.multi;
+    kv("A1/A2", c.A1_A2_ratio!=null?c.A1_A2_ratio.toFixed(3):"—"); kv("A1−A2", c.A1_A2_diff!=null?c.A1_A2_diff.toFixed(3):"—"); kv("Σ", c.sumaAr!=null?c.sumaAr.toFixed(3):"—");
+    kv("A1", c.A1!=null?c.A1.toFixed(3):"—"); kv("A2", c.A2!=null?c.A2.toFixed(3):"—"); kv("A3", c.A3!=null?c.A3.toFixed(3):"—"); kv("A4", c.A4!=null?c.A4.toFixed(3):"—");
+  } else if(v.modo==="photometrics"){
+    const f=a.fotometria;
+    kv("N", f.n!=null?f.n:"—"); kv("Media", f.media!=null?f.media.toFixed(4):"—"); kv("SD", f.sd!=null?f.sd.toFixed(4):"—");
+    kv("Máx", f.max!=null?f.max.toFixed(4):"—"); kv("Mín", f.min!=null?f.min.toFixed(4):"—"); kv("Saturadas", f.saturados!=null?f.saturados:"—");
+  }
+  box.innerHTML=h||"<span class='kv'>—</span>";
+}
 
+function pintarTabla(tabla,cap){
+  const t=$("#tabla"); if(!t) return;
+  let h="<tr>"+tabla.columnas.map(c=>`<th>${c}</th>`).join("")+"</tr>";
+  const filas=tabla.filas.slice(0,cap);
+  for(const f of filas) h+="<tr>"+f.map(c=>`<td>${c}</td>`).join("")+"</tr>";
+  t.innerHTML=h;
+}
+
+// ---------------- exportar ----------------
+function descargar(blob,nombre){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=nombre; a.click(); URL.revokeObjectURL(a.href);}
+function nomArchivo(ext){ const base=(indice&&indice.metodos[metAct]?indice.metodos[metAct].nombre:"vista").replace(/[\\/:*?"<>| ]+/g,"_"); return `Maestro_${base}${ext}`; }
+
+function exportarCSV(){
+  if(!ultimaVista||!ultimaVista.tabla) return;
+  const col=ultimaVista.tabla.columnas.map(c=>JSON.stringify(c)).join(",");
+  const filas=ultimaVista.tabla.filas.map(f=>f.map(x=>JSON.stringify(String(x??""))).join(",")).join("\n");
+  descargar(new Blob(["\ufeff"+col+"\n"+filas],{type:"text/csv;charset=utf-8"}), nomArchivo(".csv"));
+}
+function exportarPNG(){
+  if(!ultimaVista||!ultimaVista.figura_b64) return;
+  const a=document.createElement("a"); a.href="data:image/png;base64,"+ultimaVista.figura_b64; a.download=nomArchivo(".png"); a.click();
+}
+async function exportarXLSX(){
+  const b=$("#b_xlsx"); b.disabled=true; estado("generando informe Excel (toda la tarjeta)… puede tardar");
+  try{
+    const js=await pyodide.runPythonAsync("__import__('visor').informe_xlsx_json()");
+    const r=JSON.parse(js);
+    const bin=atob(r.xlsx_b64), u8=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+    descargar(new Blob([u8],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}), nomArchivo(".xlsx"));
+    estado("informe exportado ("+r.metodos+" métodos).");
+  }catch(e){ estado("ERROR al generar informe: "+e); console.error(e); }
+  finally{ b.disabled=false; }
+}
+
+// ---------------- eventos ----------------
+$("#f_carpeta").addEventListener("change",ev=>{ if(ev.target.files.length) montar(ev.target.files); });
+$("#b_csv").onclick=exportarCSV;
+$("#b_png").onclick=exportarPNG;
+$("#b_xlsx").onclick=exportarXLSX;
 iniciar();
 </script>
 </body>
